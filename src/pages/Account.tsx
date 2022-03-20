@@ -12,7 +12,7 @@ const Account = () => {
   const current_user = localStorage.getItem('user')
   const {username} = useParams()
   const [isonline,updatestatus] = useState<any>()
-  const online_url_check = 'http://localhost:8000/check_online_status/'+username
+  const online_url_check = 'https://backend-api-python.herokuapp.com/check_online_status/'+username
   useEffect(()=>{
     axios.post(online_url_check,{'username':username})
     .then(response => updatestatus(
@@ -38,8 +38,8 @@ const Account = () => {
   const [selected_user, update_user] = useState('')
   const [stsdesc, update] = useState('')
   const [iconurl, update_iconurl] = useState('')
-  const url = 'http://localhost:8000/users/'+username
-  const url_desc_get = 'http://localhost:8000/users/description_get/'+username
+  const url = 'https://backend-api-python.herokuapp.com/users/'+username
+  const url_desc_get = 'https://backend-api-python.herokuapp.com/users/description_get/'+username
   
   if(iconurl===''){
   return(

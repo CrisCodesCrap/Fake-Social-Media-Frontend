@@ -13,9 +13,9 @@ const Chat = () => {
   const [chosenEmoji,setChosenEmoji] = useState<any>('')
   const handleSend = async()=>{
     if(message!==undefined && message !== ''){
-    await axios.post('http://localhost:8000/send_msg',{'sender':current_user,'content':message,'room':1})
+    await axios.post('https://backend-api-python.herokuapp.com/send_msg',{'sender':current_user,'content':message,'room':1})
     .then((r)=>console.log(r.data['code']))
-    await axios.get('http://localhost:8000/get_msg')
+    await axios.get('https://backend-api-python.herokuapp.com/get_msg')
   .then((messages)=>{
   const messagearray = messages.data['messages']
   update_message('')
@@ -31,7 +31,7 @@ const Chat = () => {
   }
   const current_user = localStorage.getItem('user')
   useEffect(()=>{
-    axios.get('http://localhost:8000/get_msg')
+    axios.get('https://backend-api-python.herokuapp.com/get_msg')
     .then((messages)=>{
       const messagearray = messages.data['messages']
       update_messagelist(messagearray)
@@ -39,7 +39,7 @@ const Chat = () => {
       if(element !== null) element.scrollTop = element.scrollHeight  
     })
     const message_update = setInterval(async()=>{
-    await axios.get('http://localhost:8000/get_msg')
+    await axios.get('https://backend-api-python.herokuapp.com/get_msg')
     .then((messages)=>{
       const messagearray = messages.data['messages']
       update_messagelist(messagearray)

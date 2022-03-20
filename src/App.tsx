@@ -16,7 +16,7 @@ export default function App():ReactElement {
   useEffect(() =>{
   let user = window.localStorage.getItem('user')
     const is_online = setInterval(async()=>{
-      let online_url = 'http://localhost:8000/is_online/'+user
+      let online_url = 'https://backend-api-python.herokuapp.com/is_online/'+user
       await axios.post(online_url,{'user':user})
       .catch(error=> console.error(error))
       },60000)
@@ -25,7 +25,7 @@ export default function App():ReactElement {
     change_url(thisurl)
     window.addEventListener('beforeunload', (event) => {
       event.preventDefault()
-    const user_url = 'http://localhost:8000/set_offline/'+user
+    const user_url = 'https://backend-api-python.herokuapp.com/set_offline/'+user
     axios.post(user_url,{'user':user})
   })},[])
   const signout = () =>{

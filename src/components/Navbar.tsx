@@ -60,7 +60,7 @@ const Navbar = (props:any):ReactElement => {
                 <UserIcon src={user_icon}></UserIcon>
                 </NavBtnRight>
                 <NavBtnLink to='/sign-in' onClick={()=>{
-                  const user_url = 'http://localhost:8000/set_offline/'+localStorage.getItem('user')
+                  const user_url = 'https://backend-api-python.herokuapp.com/set_offline/'+localStorage.getItem('user')
                   axios.post(user_url,{'user':localStorage.getItem('user')})
                   props.signout()
                 }}>Logout</NavBtnLink>

@@ -29,7 +29,7 @@ const Signup = (props:any):ReactElement => {
     change_data({email:logindata.email,username:logindata.username,password:password})
   }
   const APIRequestHandler = () =>{
-    axios.post('http://127.0.0.1:8000/sign-up',
+    axios.post('https://backend-api-python.herokuapp.com/sign-up',
     {
       email:logindata.email,
       username:logindata.username,
