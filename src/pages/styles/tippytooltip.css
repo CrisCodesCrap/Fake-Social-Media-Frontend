@@ -1,0 +1,8 @@
+.tippy-box[data-theme~='mytheme'] {
+    background-color: darkgrey;
+    opacity: 0.8;
+    color: #fff;
+    font-weight: 200;
+    border-radius: 3px;
+    padding: 6px;
+}
