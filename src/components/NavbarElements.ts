@@ -1,8 +1,77 @@
-import {FaBars} from 'react-icons/fa';
+import {FaBars, FaSearch} from 'react-icons/fa';
 import {ImCross} from 'react-icons/im';
 import { NavLink as Link } from 'react-router-dom';
 import styled from 'styled-components';
 import '../pages/styles/font_import.css';
+
+export const FoundUserPic = styled.img`
+  height: 30px;
+  width:30px;
+  margin-right: 5%;
+  z-index: 1000000;
+  border-radius:50%;
+`
+
+export const FoundMatchUser = styled.div`
+display:flex;
+cursor: pointer;
+justify-content: start;
+min-width:160px;
+background:#3994FC;
+position:relative;
+height:20px;
+padding: 15px;
+align-items: center;
+z-index: 100000000;
+transition: all 0.2s ease-in-out;
+color: white;
+&:hover{
+  background:#0578FB;
+  transition: all 0.2s ease-in-out;
+  color:#000913;
+};
+`
+
+export const UserList = styled.div`
+width:35%;
+background: transparent;
+display: grid;
+justify-content: start;
+position: absolute;
+top: 120px;
+
+color: #000913;
+height: 35px;
+z-index: 100000000;
+`
+
+export const UserInput = styled.input`
+outline: none;
+border: none;
+text-align: start;
+color: #000913;
+width: 35%;
+height: 20%;
+border-radius:6px;
+justify-content: center;
+position: relative;
+align-items:center;
+`
+export const Search = styled(FaSearch)`
+width: 12%;
+cursor: text;
+color: #000913;
+&.active {
+    color: #000913;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 2px solid #046EE9;
+  }
+  &.hover {
+    color: #000913;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 2px solid #046EE9;
+  }
+`
 
 export const User_Icon = styled.img`
   min-width: 40px;
@@ -16,7 +85,7 @@ export const Nav = styled.nav `
   display: flex;
   padding: 0.2rem calc((100vw - 1000px) / 2);
   z-index: 100;
-  background: #F5DFBB;
+  background: transparent !important;
   justify-content: space-between;
   font-family: 'Roboto', sans-serif;
   @media screen and (max-width: 768px) {
@@ -55,7 +124,7 @@ export const NavBtnLeftMobile = styled(Link)`
   }
 }`;
   export const NavBtnLeft = styled(Link)`
-  color: #562C2C;
+  color: #000913;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -64,34 +133,37 @@ export const NavBtnLeftMobile = styled(Link)`
   font-stretch: none;
   text-decoration: none;
   padding: 0 1rem;
-  height: 100%;
+  height: 50%;
+  transition: all 0.2s ease-in-out;
   cursor: pointer;
   &.active {
-    color: #2A1616;
-    transition: all 0.4s ease-in-out;
+    color: #000913;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 2px solid #046EE9;
   }
   &:hover{
-    transition: all 0.4s ease-in-out;
-    color: #2A1616;
+    transition: all 0.2s ease-in-out;
+    color: #046EE9;
   }`;
 export const NavBtnRight = styled(Link)`
-  color: #562C2C;
+  color: #000913;
   display: flex;
   align-items: center;
   font-weight: 500;
   justify-content: flex-end;
   text-decoration: none;
   padding: 0 1rem;
-  height: 100%;
+  height: 50%;
   cursor: pointer;
-  transition: all 0.4s ease-in-out;
+  transition: all 0.2s ease-in-out;
   &.active {
-    color: #2A1616;
-    transition: all 0.4s ease-in-out;
-  };
+    color: #000913;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 2px solid #046EE9;
+  }
   &:hover{
-    transition: all 0.4s ease-in-out;
-    color: #2A1616;
+    transition: all 0.2s ease-in-out;
+    color: #046EE9;
   }`;
 
 export const Bars = styled(FaBars)`
@@ -107,6 +179,22 @@ export const Bars = styled(FaBars)`
     cursor: pointer;
     z-index: 1000;
 }`;
+export const CrossSearchUser = styled(ImCross)`
+width: 12%;
+height: 15%;
+cursor: pointer;
+color: #000913;
+&.active {
+    color: #000913;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 2px solid #046EE9;
+  }
+  &.hover {
+    color: #000913;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 2px solid #046EE9;
+  }
+`
 export const Cross = styled(ImCross)`
 display: none;
 color: white !important;
@@ -129,7 +217,7 @@ export const MobileNavMenuButtonText = styled(Link)`
     align-items: center;
     justify-content: flex-start;
     padding-left: 5%;
-    color: #90CAF9;
+    color: #000913;
     transition: all 0.4s ease-in-out;
     width: 100%;
     height: 50px;
@@ -146,7 +234,6 @@ export const MobileNavMenuButtonSign = styled(Link)`
     width: 80px;
     height: 50px;
     background-color:#0d47a1;
-    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
     text-decoration: none;
     padding: 10px;
     color: #90CAF9;
@@ -203,9 +290,9 @@ export const NavBtn = styled.nav `
 
 export const NavBtnLink = styled(Link)`
   border-radius: 4px;
-  background: #0E9594;
+  background: #3994FC;
   padding: 10px 22px;
-  color: #212529;
+  color: #fff;
   font-weight: 500;
   outline: none;
   border: none;
@@ -213,15 +300,14 @@ export const NavBtnLink = styled(Link)`
   transition: all 0.4s ease-in-out;
   text-decoration: none;
   margin-left: 24px;
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
   &:hover {
     transition: all 0.4s ease-in-out;
-    background: #0E9594;
-    color: #f8f9fa;
+    background: #1982FC;
+    color: #fff;
   }
   &.active{
-    color: #f8f9fa;
-    background: #0E9594;
+    color: #fff;
+    background: #1982FC;
   }
   `;
 

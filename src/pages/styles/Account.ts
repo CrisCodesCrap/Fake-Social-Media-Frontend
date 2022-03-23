@@ -3,7 +3,7 @@ import '../styles/font_import.css';
 
 export const Username = styled.h1`
     margin-left: 5px;
-    color: #562C2C;
+    color: #000913;
     font-family: 'Roboto', sans-serif;
 `
 export const DescriptionInput = styled.input`
@@ -23,7 +23,7 @@ margin-top:10%;
 font-weight: bolder;
 `
 export const AccountWrapper = styled.div`
-    width: 20%;
+    padding: 10px;
     height: 70%;
     background-color: #fff;
     position: absolute;
@@ -44,7 +44,7 @@ export const PageWrapper = styled.div`
     width:90%;
     height:90%;
     position:absolute;
-    background: #127475;
+    background: #046EE9;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -62,38 +62,7 @@ export const Wrapper = styled.div`
     width:100%;
     height:100%;
     position:absolute;
-    background: #0e9594;
+    background: #fff;
     z-index: -2;
-`
-export const Msginput = styled.input`
-    outline: none;
-    height: 20px;
-    position:absolute;
-    top: 45%;
-    left:50%;
-    transform: translate(-50%,-50%);
-    border: 1px solid black;
-`
-export const Sendbtn = styled.button`
-    height: 40px;
-    width: 80px;
-    position:absolute;
-    top: 50%;
-    left:50%;
-    transform: translate(-50%,-50%);
-    border: 1px solid black;
-`
-export const Messageslist = styled.ul`
-    height: 50px;
-`
-export const Message = styled.li`
-height: 30px;
-text-align: center;
-justify-content: center;
-width: 80px;
-border-radius: 12px;
-background: #fff;
-border: 0;
-list-style: none;
-margin:90px;
+    
 `

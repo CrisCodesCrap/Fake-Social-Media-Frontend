@@ -29,7 +29,7 @@ const Signup = (props:any):ReactElement => {
     change_data({email:logindata.email,username:logindata.username,password:password})
   }
   const APIRequestHandler = () =>{
-    axios.post('https://backend-api-python.herokuapp.com/sign-up',
+    axios.post('http://localhost:8000/sign-up',
     {
       email:logindata.email,
       username:logindata.username,
@@ -55,7 +55,7 @@ const Signup = (props:any):ReactElement => {
     <Wrapper>
       <Form>
         <FormWrapper>
-          <h1 style={{marginTop: '150px'}}>Sign up<UserIcon></UserIcon></h1>
+          <h1 style={{marginTop: '150px',color:'#000913'}}>Sign up<UserIcon></UserIcon></h1>
           <FormInput placeholder="Email:" type="email" onChange={handleemail} ></FormInput>
           <FormInput placeholder="Username:" type="text" onChange={handleusername} ></FormInput>
           <FormInput placeholder="Password:" type={isprivacy?'password':'text'} onChange={handlepassword} style={{marginBottom:'24px'}}></FormInput>

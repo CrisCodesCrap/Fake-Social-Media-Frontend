@@ -24,7 +24,7 @@ const Signin = (props:any) => {
     change_data({username:logindata.username,password:password})
   }
   const APIRequestHandler = () =>{
-    axios.post('https://backend-api-python.herokuapp.com/login',
+    axios.post('http://localhost:8000/login',
     {
       username:logindata.username,
       password:logindata.password
@@ -46,13 +46,13 @@ const Signin = (props:any) => {
     <Wrapper>
       <Form onSubmit={APIRequestHandler}>
         <FormWrapper>
-          <h1 style={{marginTop: '150px'}}>Sign in<UserIcon></UserIcon></h1>
+          <h1 style={{marginTop: '150px',color:'#000913'}}>Sign in<UserIcon></UserIcon></h1>
           <FormInput placeholder="Username:" onChange={ e => handleusername(e)} name='username' type="text" ></FormInput>
           <FormInput placeholder="Password:" onChange={ e => handlepassword(e)} name='password' type={isprivacy?'password':'text'} style={{marginBottom:'24px'}}></FormInput>
           {isprivacy?<LockLocked onClick={()=>{change_privacy(isprivacy?false:true)}}></LockLocked>:undefined}
           {!isprivacy?<LockOpen  onClick={()=>{change_privacy(isprivacy?false:true)}}></LockOpen>:undefined}
           <br></br>
-          <div style={{height:'0px',backgroundColor:'transparent',width:width<=768 ? '70%':'60%',left:width<=768?'15%':'20%',position:'absolute',border:'1px dashed #1f1c1f'}}></div>
+          <div style={{height:'0px',backgroundColor:'transparent',width:width<=768 ? '70%':'60%',left:width<=768?'15%':'20%',position:'absolute',border:'1px dashed #000913'}}></div>
           <br></br>
           <ForgotPasswordSpn to='/ForgotPassword'>Forgot Password?</ForgotPasswordSpn>
           {width<=768?<br></br>:undefined}
