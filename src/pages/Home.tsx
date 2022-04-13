@@ -11,10 +11,10 @@ const Home = (props:any) => {
   
   if(auth.isAuthenticated){
     return(
-    <h1>Hi,{name}</h1>
+    <div style={{height: "800px",position: "relative"}}><h1>Hi,{name}</h1></div>
   )}   
   return (
-      <div>
+      <div style={{height: "800px",position: "relative"}}>
       </div>
     )
   }

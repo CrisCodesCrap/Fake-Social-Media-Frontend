@@ -56,13 +56,13 @@ const Signup = (props:any):ReactElement => {
       <Form>
         <FormWrapper>
           <h1 style={{marginTop: '150px',color:'#000913'}}>Sign up<UserIcon></UserIcon></h1>
-          <FormInput placeholder="Email:" type="email" onChange={handleemail} ></FormInput>
-          <FormInput placeholder="Username:" type="text" onChange={handleusername} ></FormInput>
+          <FormInput placeholder="Email:" type="email" onChange={handleemail}></FormInput>
+          <FormInput placeholder="Username:" type="text" onChange={handleusername}></FormInput>
           <FormInput placeholder="Password:" type={isprivacy?'password':'text'} onChange={handlepassword} style={{marginBottom:'24px'}}></FormInput>
           {isprivacy?<LockLocked onClick={()=>{change_privacy(isprivacy?false:true)}}></LockLocked>:undefined}
           {!isprivacy?<LockOpen onClick={()=>{change_privacy(isprivacy?false:true)}}></LockOpen>:undefined}
           <br></br>
-          <div style={{height:'0px',backgroundColor:'transparent',width:width<=768 ? '70%':'60%',left:width<=768?'15%':'20%',position:'absolute',border:'1px dashed #1f1c1f'}}></div>
+          <div style={{marginLeft:'25%  ',height:'0px',backgroundColor:'transparent',width:'50%',border:'1px dashed #000913'}}></div>
           <br></br>
 
           {width<=768?<br></br>:undefined}

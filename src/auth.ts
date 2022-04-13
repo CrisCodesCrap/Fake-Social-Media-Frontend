@@ -12,7 +12,6 @@ export const auth = {
                 if (decoded_token !== null && decoded_token !== undefined){
                     auth.isAuthenticated = true
                     auth.username = decoded_token['sub']
-                    console.log(decoded_token['sub'])
                     axios.post('http://127.0.0.1:8000/refresh_token_renew',
                     {
                         'refresh_token':refresh_token,
@@ -20,7 +19,6 @@ export const auth = {
                     }).then(response => {
                         if(response.data["refresh_token"] !== undefined){
                             localStorage.setItem('token', response.data["refresh_token"])
-                            console.log(response.data['user'],'ahmed')
                         }
                         if(response.data['user'] !== undefined){
                             window.localStorage.setItem('user', auth.username)

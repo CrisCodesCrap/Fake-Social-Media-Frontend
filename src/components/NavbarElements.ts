@@ -1,27 +1,85 @@
-import {FaBars, FaSearch} from 'react-icons/fa';
+import {FaBars,FaBell, FaSearch, FaCheck} from 'react-icons/fa';
 import {ImCross} from 'react-icons/im';
 import { NavLink as Link } from 'react-router-dom';
 import styled from 'styled-components';
 import '../pages/styles/font_import.css';
 
+export const Bell = styled(FaBell)`
+  width: 25px;
+  height: 25px;
+  margin-left: 4px;
+  margin-top: 5px;
+  z-index: 10000000;
+  position: relative;
+  cursor: pointer;
+  color:#000913;
+`
+export const BellDropDown = styled.div`
+background: transparent;
+margin-top: 25px;
+display: block;
+right: 0;
+color: #fff;
+position:absolute;
+min-width: 540px;
+display: block;
+z-index:1000000;
+`
+export const Notification = styled.div`
+position:relative;
+background:#3994FC;
+min-height:40px;
+width:100%;
+transition: all 0.4s ease-in-out;
+display:flex;
+justify-content: space-between;
+padding: 2px 8px 2px 8px;
+align-items: center;
+`
+export const AcceptIcon = styled(FaCheck)`
+  color:white;
+  position:relative;
+`
+export const DeclineIcon = styled(ImCross)`
+color:white;
+position:relative;
+`
 export const FoundUserPic = styled.img`
   height: 30px;
   width:30px;
-  margin-right: 5%;
+  margin-right: 15px;
+  margin-left: 15px;
   z-index: 1000000;
   border-radius:50%;
 `
-
-export const FoundMatchUser = styled.div`
+export const SearchHeader = styled.div`
 display:flex;
+text-decoration: none;
+text-align: center; 
 cursor: pointer;
 justify-content: start;
-min-width:160px;
+background:#3994FC;
+position:relative;
+height:19px;
+align-items: center;
+padding: 15px;
+z-index: 100000000;
+border-bottom: 1px solid white;
+transition: all 0.2s ease-in-out;
+color: white;
+
+`
+
+export const FoundMatchUser = styled(Link)`
+display:flex;
+text-decoration: none;
+cursor: pointer;
+justify-content: start;
 background:#3994FC;
 position:relative;
 height:20px;
-padding: 15px;
 align-items: center;
+padding: 15px;
 z-index: 100000000;
 transition: all 0.2s ease-in-out;
 color: white;
@@ -33,43 +91,54 @@ color: white;
 `
 
 export const UserList = styled.div`
-width:35%;
-background: transparent;
-display: grid;
-justify-content: start;
-position: absolute;
-top: 120px;
-
-color: #000913;
-height: 35px;
-z-index: 100000000;
+    background: transparent;
+    position: absolute;
+    top: 120px;
+    color: #000913;
+    width: 180px;
+    z-index: 100000000;
+    border-radius: 6px;
 `
+export const DropdownContent = styled.div`
+width:100%;
+background: #BDDBFE;
+height: 100px;
+padding: 2px 8px 2px 8px;
+border-radius: 0 0 2px 2px;
+`
+export const NotificationHeader = styled.div`
+padding: 2px 8px 2px 8px;
+background:#024A9B;
+height: 40px;
+align-items: center;
 
+color:#fff;
+width: 100%;
+`
 export const UserInput = styled.input`
 outline: none;
 border: none;
 text-align: start;
 color: #000913;
-width: 35%;
-height: 20%;
+width:160px;
+height: 30px;
+padding: 0;
 border-radius:6px;
 justify-content: center;
-position: relative;
-align-items:center;
 `
 export const Search = styled(FaSearch)`
-width: 12%;
+width: 20px;
+height: 20px;
+margin-right: 5px;
 cursor: text;
 color: #000913;
 &.active {
     color: #000913;
     transition: all 0.2s ease-in-out;
-    border-bottom: 2px solid #046EE9;
   }
   &.hover {
     color: #000913;
     transition: all 0.2s ease-in-out;
-    border-bottom: 2px solid #046EE9;
   }
 `
 
@@ -82,6 +151,8 @@ export const User_Icon = styled.img`
 
 export const Nav = styled.nav `
   height: 120px;
+  user-select: none;
+  border-bottom: 1px solid #1982FC;
   display: flex;
   padding: 0.2rem calc((100vw - 1000px) / 2);
   z-index: 100;
@@ -147,6 +218,7 @@ export const NavBtnLeftMobile = styled(Link)`
   }`;
 export const NavBtnRight = styled(Link)`
   color: #000913;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   font-weight: 500;
@@ -180,19 +252,17 @@ export const Bars = styled(FaBars)`
     z-index: 1000;
 }`;
 export const CrossSearchUser = styled(ImCross)`
-width: 12%;
-height: 15%;
+width: 20px;
+height: 20px;
 cursor: pointer;
 color: #000913;
 &.active {
     color: #000913;
     transition: all 0.2s ease-in-out;
-    border-bottom: 2px solid #046EE9;
   }
   &.hover {
     color: #000913;
     transition: all 0.2s ease-in-out;
-    border-bottom: 2px solid #046EE9;
   }
 `
 export const Cross = styled(ImCross)`
@@ -290,6 +360,7 @@ export const NavBtn = styled.nav `
 
 export const NavBtnLink = styled(Link)`
   border-radius: 4px;
+  white-space: nowrap;
   background: #3994FC;
   padding: 10px 22px;
   color: #fff;

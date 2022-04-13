@@ -52,13 +52,11 @@ const Signin = (props:any) => {
           {isprivacy?<LockLocked onClick={()=>{change_privacy(isprivacy?false:true)}}></LockLocked>:undefined}
           {!isprivacy?<LockOpen  onClick={()=>{change_privacy(isprivacy?false:true)}}></LockOpen>:undefined}
           <br></br>
-          <div style={{height:'0px',backgroundColor:'transparent',width:width<=768 ? '70%':'60%',left:width<=768?'15%':'20%',position:'absolute',border:'1px dashed #000913'}}></div>
+          <div style={{marginLeft:'25%  ',height:'0px',backgroundColor:'transparent',width:'50%',border:'1px dashed #000913'}}></div>
           <br></br>
           <ForgotPasswordSpn to='/ForgotPassword'>Forgot Password?</ForgotPasswordSpn>
           {width<=768?<br></br>:undefined}
-          <div style={{marginLeft:'25%'}}>
           <SubmitButton onClick={APIRequestHandler}>Sign in</SubmitButton>
-          </div>
         </FormWrapper>
       </Form>
     </Wrapper>

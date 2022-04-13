@@ -6,6 +6,76 @@ export const Username = styled.h1`
     color: #000913;
     font-family: 'Roboto', sans-serif;
 `
+export const AcceptRequestBtn = styled.button`
+border: 1px solid #1982FC;
+margin-top: 25px;
+background: #1982FC;
+color: #fff ;
+height:8%;
+min-width:50px;
+border-radius:12px 0 0 12px;
+cursor: pointer ;
+padding: 1px;
+transition: all 0.4s ease-in-out;
+&:hover{
+    transition: all 0.4s ease-in-out;
+    background: #fff;
+    color: #1982FC;
+    border-radius: 0;
+}
+`
+export const DeclineRequestBtn = styled.button`
+border: 1px solid #1982FC;
+margin-top: 25px;
+background: #1982FC ;
+color: #fff ;
+height:8%;
+min-width:50px;
+border-radius:0 12px 12px 0;
+cursor: pointer ;
+padding: 1px;
+transition: all 0.4s ease-in-out;
+&:hover{
+    transition: all 0.4s ease-in-out;
+    background: #fff;
+    color: #1982FC;
+    border-radius: 0;
+}
+`
+export const SendFriendRequestBtn = styled.button`
+border: 1px solid #1982FC;
+margin-top: 25px;
+background: #1982FC ;
+color: #fff ;
+height:8%;
+min-width:100px;
+border-radius:12px;
+cursor: pointer ;
+padding: 1px;
+transition: all 0.4s ease-in-out;
+&:hover{
+    transition: all 0.4s ease-in-out;
+    background: #fff;
+    color: #1982FC;
+}
+`
+export const ClickedRequestButton = styled.button`
+border: 1px solid #1982FC;
+margin-top: 25px;
+background: #fff;
+    color: #1982fc ;
+height:8%;
+min-width:100px;
+border-radius:12px;
+cursor: pointer ;
+padding: 1px;
+transition: all 0.4s ease-in-out;
+&:hover{
+    transition: all 0.4s ease-in-out;
+    background: #fff;
+    color: #1982FC;
+}
+`
 export const DescriptionInput = styled.input`
 outline: none;
 border: 1px solid #000;
@@ -24,32 +94,26 @@ font-weight: bolder;
 `
 export const AccountWrapper = styled.div`
     padding: 10px;
-    height: 70%;
+    height: 60%;
+    width: 20%;
     background-color: #fff;
-    position: absolute;
-    top:50%;
-    left: 25%;
-    transform: translate(-50%, -50%);
     justify-content: center;
     text-align: center;
     align-items: center;
     border-radius:12px;
     min-width:260px;
-    @media screen and (max-width: 1024px) {
-        left: 50%;
-    }
 `
 
 export const PageWrapper = styled.div`
     width:90%;
     height:90%;
-    position:absolute;
     background: #046EE9;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     z-index: -1;
     border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
 `
 export const UserPic = styled.img`
     margin-top: 5%;
@@ -59,10 +123,14 @@ export const UserPic = styled.img`
     z-index: 100000;
 `
 export const Wrapper = styled.div`
-    width:100%;
-    height:100%;
-    position:absolute;
+    width: 100%;
+    height: 800px;
+    user-select: none;
+    justify-content: center;
+    align-items: center;
+    position: relative;
     background: #fff;
-    z-index: -2;
+    display: flex;
+    z-index: 2;
     
 `
