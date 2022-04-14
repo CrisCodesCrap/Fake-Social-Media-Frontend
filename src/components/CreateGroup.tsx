@@ -12,10 +12,11 @@ const CreateGroup = (props:any):ReactElement => {
   async function createGroupHandler() {
     if(selectedUsers.length === 0) return
     let groupMembers = [...selectedUsers,props.currentUser]
-    await axios.post('http://localhost:8000/create_group', {
-      groupName: groupName,
-      userCreator: props.currentUser,
-      groupMembers: groupMembers
+    let currentUserUrl = 'http://localhost:8000/create_group/'+props.currentUser
+    await axios.post(currentUserUrl, {
+      'groupName': groupName,
+      'userCreator': props.currentUser,
+      'groupMembers': groupMembers
     }).then(res => {
       console.log(res)
     })
@@ -104,10 +105,20 @@ const CreateGroup = (props:any):ReactElement => {
             </div>
             <FoundSearchUsers>
               {
+                selectedUsers.map(function(user:string){
+                  return(
+                    <UserWrapper onClick={()=>selectUser(user)} style={{background:'#1982fc'}} key={user+' Wrapper'}>
+                      <FoundUserPic src={'https://avatars.dicebear.com/api/initials/:'+user+'.svg'}></FoundUserPic>
+                      <div draggable={false} style={{display:'inline-block',margin:'0',padding:'0'}}>{user}</div>
+                    </UserWrapper>
+                  )
+                })
+              }
+              {
                 searchResults.map(function(user){
                   return(
-                    props.currentUser !== user&&
-                    <UserWrapper style={{background:selectedUsers.includes(user)?'#1982fc':'#fff'}} onClick={()=>selectUser(user)} key={user+' Wrapper'}>
+                    props.currentUser !== user && !selectedUsers.includes(user)&&
+                    <UserWrapper onClick={()=>selectUser(user)} key={user+' Wrapper'}>
                         <FoundUserPic
                           draggable={false}
                           src={'https://avatars.dicebear.com/api/initials/:'+user+'.svg'}>
@@ -119,7 +130,9 @@ const CreateGroup = (props:any):ReactElement => {
               }
             </FoundSearchUsers>
           </WindowContentMini>
-          <ConfirmButton onClick={createGroupHandler} style={{color:selectedUsers.length===0?'#5AA6FC':'#fff',background:selectedUsers.length===0?'#fff':'#1982fc',cursor:selectedUsers.length===0?'not-allowed':'pointer'}}>Create</ConfirmButton>
+          <ConfirmButton onClick={createGroupHandler} style={{color:selectedUsers.length===0?'#ACD2FE':'#fff',background:selectedUsers.length===0?'#fff':'#1982fc',cursor:selectedUsers.length===0?'not-allowed':'pointer'}}>
+            Create
+          </ConfirmButton>
         </WindowWrapper>
     </Wrapper>
   )
