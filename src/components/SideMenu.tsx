@@ -7,10 +7,17 @@ import '../pages/styles/tippytooltip.css'
 import tippy from 'tippy.js'
 const SideMenu = ({UpdateCurrentUserChat, CurrentUserChat}:any):ReactElement => {
   const [friendslist, update_friendslist] = useState<any[]>([])
+  const [grouplist, updateGrouplist] = useState<any[]>([])
   const current_user = localStorage.getItem('user')
   useEffect(() =>{
-    const url_friends = 'http://localhost:8000/get_friendlist/'+current_user
-    axios.post(url_friends,{'username':current_user})
+    const urlFriends = 'http://localhost:8000/get_friendlist/'+current_user
+    const urlGroups = 'http://localhost:8000/get_groups/'+current_user
+    axios.post(urlGroups,{'username':current_user})
+    .then(response =>{
+      updateGrouplist(response.data['groups'])
+    })
+    .catch(err =>{})
+    axios.post(urlFriends,{'username':current_user})
     .then(response =>{
       update_friendslist(response.data['friends'])
     })
@@ -20,11 +27,24 @@ const SideMenu = ({UpdateCurrentUserChat, CurrentUserChat}:any):ReactElement => 
     <Wrapper>
       <div style={{position:'relative',color: '#1982fc',marginLeft:'5%',width:'100%',alignItems:'center',justifyContent: 'center'}}><h1>Contacts:</h1></div>
         <ContactsList>
-          {friendslist.map(friend =>{
+          {grouplist.map((group:any) => {
+            return (
+              <UserFriend onClick={async() =>{
+                await UpdateCurrentUserChat({username:group.name,room:group.id,type:true})
+                }} key={group.id}>
+                <UserPic  src={'https://avatars.dicebear.com/api/initials/:'+group.name+'.svg'}></UserPic>
+                <div style={{position:'relative',margin:'10px',cursor:'pointer'}}>
+                  <h3>{group.name}</h3>
+                  <p>{group.group_description}</p>
+                </div>
+              </UserFriend>
+            )
+          })}
+          {friendslist.map((friend:any) => {
             var thisname = document.getElementById(friend['id'])
             return(
             <UserFriend onClick={async() =>{
-              await UpdateCurrentUserChat({username:friend['friend'],room:friend['id']})
+              await UpdateCurrentUserChat({username:friend['friend'],room:friend['id'],type:false})
               }} key={friend['id']+'wrapper'}>
               <UserPic 
               draggable={false} 

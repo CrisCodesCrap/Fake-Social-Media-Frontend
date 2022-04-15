@@ -10,7 +10,12 @@ import { useNotifications } from '@mantine/notifications';
 import {io} from 'socket.io-client'
 import SideMenu from "../components/SideMenu"
 import CreateGroup from "../components/CreateGroup"
-
+/*
+Needs recent messages to be implemented.
+Can be done with the help of the socket.io event listener in the useEffect down below.
+Idea is to listen for new messages and have some kind of an object for each channel and update the messages and if they are seen by the user or not.
+Good look!
+*/
 const Chat = (props:any) => {
   const [message,update_message] = useState<any>('')
   const notifications = useNotifications()
@@ -19,12 +24,12 @@ const Chat = (props:any) => {
   const navigate = useNavigate()
   const [showCreateGroup,updateShowCreateGroup] = useState<boolean>(false)
   const [chosenEmoji,setChosenEmoji] = useState<any>('')
-  const [current_user_chat, update_current_user_chat] = useState<any>({username:'',room:0})
+  const [current_user_chat, update_current_user_chat] = useState<any>({username:'',room:0,type:undefined})
   const [last_seen,update_last_seen] = useState<any>(undefined)
   const handleSend = async()=>{
     const element:any = document.getElementById('MessageList')
     if(message!==undefined && message !== ''){
-    let msg = {'sender':current_user,'content':message,'room':current_user_chat.room}
+    let msg = {'sender':current_user,'content':message,'room':current_user_chat.room,'type':current_user_chat.type}
     await axios.post('http://127.0.0.1:8000/send_msg',msg)
     .then(async response =>{
       await axios.post('http://127.0.0.1:4000/send_msg',response.data)
@@ -39,9 +44,9 @@ const Chat = (props:any) => {
     })
   }}
   const [displayEmojiMenu,set_displayEmojiMenu] = useState(false)
-  const onEmojiClick = (emojiObject:any) => {
-    setChosenEmoji(emojiObject.emoji)
-    emojiObject.emoji !== undefined && update_message(message+emojiObject.emoji)
+  const onEmojiClick = (event:any,emojiObject:any) => {
+    setChosenEmoji(emojiObject)
+    emojiObject.emoji !== undefined && update_message(message+chosenEmoji.emoji)
   }
   const current_user = localStorage.getItem('user')
   useEffect(() => {
@@ -66,13 +71,12 @@ const Chat = (props:any) => {
 },[current_user_chat])
   useEffect(()=>{
     const element:any = document.getElementById('MessageList')
-    axios.post('http://127.0.0.1:8000/get_msg',{'room':current_user_chat.room})
+    current_user_chat.type !== undefined && axios.post('http://127.0.0.1:8000/get_msg',{'room':current_user_chat.room,'isgroup':current_user_chat.type})
     .then((messages)=>{
       const messagearray = messages.data['messages']
       update_messagelist(messagearray)
-      update_textwidth(element.clientWidth)
     const last_seen_url = 'http://127.0.0.1:8000/last_seen/'+current_user_chat.username
-    current_user_chat.username !== '' && axios.post(last_seen_url,{'username':current_user_chat.username})
+    current_user_chat.username !== ''  && !current_user_chat.type && axios.post(last_seen_url,{'username':current_user_chat.username})
     .then((response)=>{
       update_last_seen(response.data['last_seen'])
     })
@@ -85,17 +89,18 @@ const Chat = (props:any) => {
       smileicon.disabled = true
       sendbtn.disabled = true
     }})
-  const handleResize =()=>{
-    const element:any = document.getElementById('MessageList')
+    const handleResize =()=>{
+      const element:any = document.getElementById('MessageList')
+      update_textwidth(element.clientWidth)
+    }
+    window.addEventListener('resize',handleResize)
     update_textwidth(element.clientWidth)
-  }
-  window.addEventListener('resize',handleResize)
-  return ()=> window.removeEventListener('resize',handleResize)  
-},[current_user_chat,update_current_user_chat])
+    return ()=> window.removeEventListener('resize',handleResize)  
+  },[current_user_chat,update_current_user_chat])
   return (
   <div>
     {showCreateGroup &&
-      <CreateGroup currentUser={current_user} updateShowCreateGroup={updateShowCreateGroup}>
+      <CreateGroup currentUserChat={current_user_chat} currentUser={current_user} updateShowCreateGroup={updateShowCreateGroup}>
       </CreateGroup>
     }
     <div style={{display: 'flex',flexDirection:'row'}}>
@@ -103,9 +108,11 @@ const Chat = (props:any) => {
     <div style={{flex: '1',position: 'relative',display:'flex',flexDirection: 'column',margin:'3% 0 0 2%',justifyContent: 'center',alignItems:'center',marginTop:'4%'}}>
       <ChatRoomHeader>
         <div style={{marginLeft:'5%',width:'50%',display:'flex',alignItems:'center',cursor:'pointer',flexDirection:'row'}} onClick={()=>{
-          let user_address = '/users/'+current_user_chat.username
-          navigate(user_address)
-          }}>
+          if(!current_user_chat.type) {
+            let user_address = '/users/'+current_user_chat.username
+            navigate(user_address)
+          }
+         }}>
           {current_user_chat.username!==''&&
             <UserPic style={{height:'40px',width:'40px',marginRight:'2.5%'}} draggable={false} src={'https://avatars.dicebear.com/api/initials/:'+current_user_chat.username+'.svg'}>
             </UserPic>
@@ -113,7 +120,7 @@ const Chat = (props:any) => {
           <div style={{display:'flex',flexDirection:'column',alignItems:'baseline'}}>
             {current_user_chat.username}
             <div style={{color:'#023774',fontSize:'small',display:'flex'}}>
-            {last_seen !== undefined && 'Last seen: '+ moment(last_seen).fromNow()}
+            {last_seen !== undefined && !current_user_chat.type &&'Last seen: '+ moment(last_seen).fromNow()}
           </div>
           </div>
           
@@ -123,6 +130,7 @@ const Chat = (props:any) => {
         <ChatRoomSettingsIcon focusable={false}>
         </ChatRoomSettingsIcon>
         }
+        {!current_user_chat.type&&
           <CreateGroupIcon 
           onClick={()=>updateShowCreateGroup(true)}
           focusable={false} 
@@ -138,11 +146,13 @@ const Chat = (props:any) => {
             })
           }}>
           </CreateGroupIcon>
+        }
         </div>
       </ChatRoomHeader>
     {current_user_chat.username !==''?
     <>
       <Messageslist id='MessageList'>
+      <div style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center'}}>{messagelist.length===0?'No messages yet.':'You\'ve reached the end.'}</div>
         {messagelist.map(element => {
         let s = new Date(element.timesent)
         var thisname = document.getElementById(element.id)
@@ -159,7 +169,7 @@ const Chat = (props:any) => {
             delay: [200, 200],
           })
         }} onClick={()=>{
-          let user_address = '/users/'+element.sender
+          let user_address = '/users/me'
           navigate(user_address)
         }} draggable={false} src={'https://avatars.dicebear.com/api/initials/:'+element.sender+'.svg'}>
       </UserPic>

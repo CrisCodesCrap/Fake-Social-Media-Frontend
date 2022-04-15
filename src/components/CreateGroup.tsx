@@ -62,6 +62,9 @@ const CreateGroup = (props:any):ReactElement => {
       window.removeEventListener('click',clickHandler)
     }
   },[showCross,setShowCross])
+  useEffect(() => {
+    props.currentUserChat.username !== '' && !props.currentUserChat.type && !selectedUsers.includes(props.currentUserChat.username) && updateSelectedUsers([...selectedUsers, props.currentUserChat.username])
+  },[props.currentUserChat])
   return (
     <Wrapper>
         <Exit onClick={()=>props.updateShowCreateGroup(false)}></Exit>
