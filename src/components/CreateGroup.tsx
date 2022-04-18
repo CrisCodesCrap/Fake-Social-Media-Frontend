@@ -20,6 +20,7 @@ const CreateGroup = (props:any):ReactElement => {
     }).then(res => {
       console.log(res)
     })
+    props.updateShowCreateGroup(false)
   }
   function QueryUserHandler(e:any){
     updateSearch(e.target.value)

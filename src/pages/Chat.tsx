@@ -21,6 +21,7 @@ const Chat = (props:any) => {
   const notifications = useNotifications()
   const [messagelist,update_messagelist] = useState<any[]>([])
   const [textwidth,update_textwidth] = useState<any>()
+  const [settingsDisplay, changeSettingsDisplay] = useState<boolean>(false)
   const navigate = useNavigate()
   const [showCreateGroup,updateShowCreateGroup] = useState<boolean>(false)
   const [chosenEmoji,setChosenEmoji] = useState<any>('')
@@ -68,7 +69,7 @@ const Chat = (props:any) => {
     return () => {
       socket.disconnect()
   }
-},[current_user_chat])
+  },[current_user_chat])
   useEffect(()=>{
     const element:any = document.getElementById('MessageList')
     current_user_chat.type !== undefined && axios.post('http://127.0.0.1:8000/get_msg',{'room':current_user_chat.room,'isgroup':current_user_chat.type})
@@ -96,7 +97,7 @@ const Chat = (props:any) => {
     window.addEventListener('resize',handleResize)
     update_textwidth(element.clientWidth)
     return ()=> window.removeEventListener('resize',handleResize)  
-  },[current_user_chat,update_current_user_chat])
+    },[current_user_chat,update_current_user_chat, changeSettingsDisplay])
   return (
   <div>
     {showCreateGroup &&
@@ -104,7 +105,7 @@ const Chat = (props:any) => {
       </CreateGroup>
     }
     <div style={{display: 'flex',flexDirection:'row'}}>
-    <SideMenu style={{background:current_user_chat.username !==''?'#fff !important':'#1982fc'}} CurrentUserChat={current_user_chat} UpdateCurrentUserChat={update_current_user_chat}></SideMenu>
+    <SideMenu style={{background:current_user_chat.username !==''?'#fff !important':'#1982fc'}} updateDisplaySettings={changeSettingsDisplay} CurrentUserChat={current_user_chat} UpdateCurrentUserChat={update_current_user_chat}></SideMenu>
     <div style={{flex: '1',position: 'relative',display:'flex',flexDirection: 'column',margin:'3% 0 0 2%',justifyContent: 'center',alignItems:'center',marginTop:'4%'}}>
       <ChatRoomHeader>
         <div style={{marginLeft:'5%',width:'50%',display:'flex',alignItems:'center',cursor:'pointer',flexDirection:'row'}} onClick={()=>{
@@ -127,8 +128,8 @@ const Chat = (props:any) => {
         </div>
         <div style={{width:'50%'}}>
         {current_user_chat.username!==''&&
-        <ChatRoomSettingsIcon focusable={false}>
-        </ChatRoomSettingsIcon>
+          <ChatRoomSettingsIcon onClick={()=>changeSettingsDisplay(!settingsDisplay)} focusable={false}>
+          </ChatRoomSettingsIcon>
         }
         {!current_user_chat.type&&
           <CreateGroupIcon 
@@ -151,6 +152,10 @@ const Chat = (props:any) => {
       </ChatRoomHeader>
     {current_user_chat.username !==''?
     <>
+      {settingsDisplay?
+      <Messageslist style={{display:'flex',justifyContent:'center'}}>
+        <h4 style={{color:'#1982fc'}}>{current_user_chat.username}</h4>
+      </Messageslist>:
       <Messageslist id='MessageList'>
       <div style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center'}}>{messagelist.length===0?'No messages yet.':'You\'ve reached the end.'}</div>
         {messagelist.map(element => {
@@ -194,10 +199,12 @@ const Chat = (props:any) => {
       </MessageWrapper>
     )})}
     </Messageslist>
+    }
       <div style={{width:textwidth-6+'px',display: 'flex',textAlign:'center',alignItems: 'center',justifyContent: 'space-evenly',borderRadius:'6px',padding:'5px',border:'1px solid #1982FC'}}>
     <SmileIcon style={{cursor:current_user===null?'not-allowed':''}} id="SmileIcon" onClick={()=>{
       current_user !== null && set_displayEmojiMenu(displayEmojiMenu?false:true)
-    }}></SmileIcon>
+      }}>
+    </SmileIcon>
     {displayEmojiMenu&&<div style={{position: 'absolute',bottom:'100px',zIndex:1000000}}><Picker onEmojiClick={onEmojiClick} /></div>}
     <Msginput onKeyPress={(e)=> e.key === 'Enter' && handleSend()} id='Input' value={message} placeholder={current_user!==null?'Say something.':'You are not signed-in and can\'t write here.'} style={{cursor:current_user===null?'not-allowed':''}} onChange={e=>{
       if(message.length !== 1500 && message.length < 1500) update_message(e.target.value)
@@ -207,8 +214,9 @@ const Chat = (props:any) => {
           message: 'your message is too long..',
           color: 'red',
         })
-      }
-      }}></Msginput>
+        }
+      }}>
+    </Msginput>
       <Sendbtn id="Sendbtn" onClick={()=>handleSend()} style={{cursor:current_user===null?'not-allowed':'pointer'}} >Send</Sendbtn>
       </div>
   </>:
@@ -218,9 +226,11 @@ const Chat = (props:any) => {
       <h2>Send messages to friends:</h2>
       <h4 style={{color: '#1982fc'}}>Choose a group or a friend from the contacts panel on your left.</h4>
       <div>
-        <CreateGroupButton onClick={()=>{updateShowCreateGroup(true)}}>
-          Create a group
-        </CreateGroupButton>
+        {current_user !== null&&
+          <CreateGroupButton onClick={()=>{updateShowCreateGroup(true)}}>
+            Create a group
+          </CreateGroupButton>
+        }
       </div>
     </div>
   </Messageslist>

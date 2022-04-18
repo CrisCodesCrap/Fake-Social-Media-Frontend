@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Wrapper = styled.div`
 width:20%;
 user-select: none;
-margin:3% 0 0 0;
+margin:3.5% 0 0 0;
 background: white;
 border: 1px solid #1982FC;
 border-left: 0;
