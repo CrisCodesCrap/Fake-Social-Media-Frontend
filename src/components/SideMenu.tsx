@@ -5,7 +5,7 @@ import { UserPic } from '../pages/styles/Chat'
 import moment from 'moment'
 import '../pages/styles/tippytooltip.css'
 import tippy from 'tippy.js'
-const SideMenu = ({UpdateCurrentUserChat, updateDisplaySettings, CurrentUserChat}:any):ReactElement => {
+const SideMenu = ({handleUnfriend,UpdateCurrentUserChat, updateDisplaySettings, CurrentUserChat}:any):ReactElement => {
   const [friendslist, update_friendslist] = useState<any[]>([])
   const [grouplist, updateGrouplist] = useState<any[]>([])
   const current_user = localStorage.getItem('user')
@@ -26,7 +26,7 @@ const SideMenu = ({UpdateCurrentUserChat, updateDisplaySettings, CurrentUserChat
       }))
   })
     .catch(err =>{console.error(err)})
-  },[])
+  },[handleUnfriend])
   return(
     <Wrapper>
       {friendslist.length !== 0 && grouplist.length !== 0 ?

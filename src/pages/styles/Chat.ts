@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import '../styles/font_import.css';
-import {FaSmile,FaUserPlus,FaEllipsisV,FaCommentMedical} from 'react-icons/fa'
+import {FaSmile,FaUserPlus,FaEllipsisV,FaCommentMedical, FaUser} from 'react-icons/fa'
 
 export const SmileIcon = styled(FaSmile)`
     height:20px;
@@ -83,6 +83,9 @@ export const CreateGroupIcon = styled(FaCommentMedical)`
     margin-right: 5%;
     color: #fff;
 `
+export const CreateGroupIconLeave = styled(FaCommentMedical)`
+margin-left: 4px;
+`
 export const CreateGroupButton = styled.button`
 background: #3ABEFF;
 margin-top: 6%;
@@ -100,6 +103,24 @@ transition: all 0.4s ease-in-out;
     color: #3ABEFF;
     transition: all 0.4s ease-in-out; 
 }
+`
+export const UserIcon = styled(FaUser)`
+    color: #fff;
+    margin-left: 4px;
+`
+export const LeaveButton = styled.div`
+    background: #1982fc;
+    border: 1px solid #1982fc;
+    border-radius: 12px;
+    padding:0.8%;
+    color: #fff;
+    height: 20px;
+    width: fit-content;
+    block-size: fit-content;
+    margin: 3% 1% 0 1%;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.4s ease-in-out; 
 `
 export const Messageslist = styled.ul`
    position: relative;
@@ -148,3 +169,4 @@ overflow-wrap: break-word;
 word-wrap: break-word;
 hyphens: auto;
 `
+

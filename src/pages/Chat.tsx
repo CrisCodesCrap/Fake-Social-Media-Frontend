@@ -1,6 +1,6 @@
 import axios from "axios"
-import {useEffect, useState} from "react"
-import {Message,MessageWrapper,Messageslist,Msginput,Sendbtn,UserPic,SmileIcon, ChatRoomHeader, CreateGroupIcon, ChatRoomSettingsIcon, CreateGroupButton } from './styles/Chat'
+import {useEffect, useRef, useState} from "react"
+import {Message,MessageWrapper,Messageslist,LeaveButton,Msginput,Sendbtn,UserPic,SmileIcon, ChatRoomHeader, CreateGroupIcon, ChatRoomSettingsIcon, CreateGroupButton, UserIcon, CreateGroupIconLeave } from './styles/Chat'
 import moment from "moment"
 import { useNavigate } from "react-router"
 import tippy from 'tippy.js';
@@ -23,12 +23,12 @@ const Chat = (props:any) => {
   const [textwidth,update_textwidth] = useState<any>()
   const [settingsDisplay, changeSettingsDisplay] = useState<boolean>(false)
   const navigate = useNavigate()
+  const msglist = useRef<any>(null)
   const [showCreateGroup,updateShowCreateGroup] = useState<boolean>(false)
   const [chosenEmoji,setChosenEmoji] = useState<any>('')
   const [current_user_chat, update_current_user_chat] = useState<any>({username:'',room:0,type:undefined})
   const [last_seen,update_last_seen] = useState<any>(undefined)
   const handleSend = async()=>{
-    const element:any = document.getElementById('MessageList')
     if(message!==undefined && message !== ''){
     let msg = {'sender':current_user,'content':message,'room':current_user_chat.room,'type':current_user_chat.type}
     await axios.post('http://127.0.0.1:8000/send_msg',msg)
@@ -36,31 +36,30 @@ const Chat = (props:any) => {
       await axios.post('http://127.0.0.1:4000/send_msg',response.data)
       .catch(err =>console.log(err))
       update_message('')
-      if(element !== null){
+      if(msglist.current !== null){
         set_displayEmojiMenu(false)
         let mesg = response.data
         update_messagelist(messagelist=>[...messagelist,mesg])
-        element.scrollTop = element.scrollHeight
+        msglist.current.scrollTop = msglist.current.scrollHeight
       }
     })
   }}
   const [displayEmojiMenu,set_displayEmojiMenu] = useState(false)
-  const onEmojiClick = (event:any,emojiObject:any) => {
+  const onEmojiClick = async (event:any,emojiObject:any) => {
     setChosenEmoji(emojiObject)
-    emojiObject.emoji !== undefined && update_message(message+chosenEmoji.emoji)
+    emojiObject.emoji !== undefined && emojiObject.emoji !== 'undefined' && update_message(message+emojiObject.emoji)
   }
   const current_user = localStorage.getItem('user')
   useEffect(() => {
-    const element:any = document.getElementById('MessageList')
     const socket = io('http://127.0.0.1:4000/')
     socket.on('message',(e)=>{
       if(e.sender !== current_user) {
         update_message('')
-        if(element !== null){
+        if(msglist.current !== null){
           set_displayEmojiMenu(false)
           if(current_user_chat.room === e.room) { 
             update_messagelist(messagelist=>[...messagelist,e])
-            element.scrollTop = element.scrollHeight
+            msglist.current.scrollTop = msglist.current.scrollHeight
         }
       }
     }
@@ -91,13 +90,20 @@ const Chat = (props:any) => {
       sendbtn.disabled = true
     }})
     const handleResize =()=>{
-      const element:any = document.getElementById('MessageList')
-      update_textwidth(element.clientWidth)
+      update_textwidth(msglist.current.clientWidth)
     }
     window.addEventListener('resize',handleResize)
-    update_textwidth(element.clientWidth)
+    update_textwidth(msglist.current.clientWidth)
     return ()=> window.removeEventListener('resize',handleResize)  
     },[current_user_chat,update_current_user_chat, changeSettingsDisplay])
+    const handleUnfriend = async () => {
+      const unfriendurl = 'http://localhost:8000/unfriend/'+current_user_chat.username
+      await axios.post(unfriendurl,{'username':current_user_chat.username,'friend':current_user_chat.username})	
+      .then(response => {
+        if(response.data['status'] === 'success'){
+        }
+      })
+    }
   return (
   <div>
     {showCreateGroup &&
@@ -105,7 +111,7 @@ const Chat = (props:any) => {
       </CreateGroup>
     }
     <div style={{display: 'flex',flexDirection:'row'}}>
-    <SideMenu style={{background:current_user_chat.username !==''?'#fff !important':'#1982fc'}} updateDisplaySettings={changeSettingsDisplay} CurrentUserChat={current_user_chat} UpdateCurrentUserChat={update_current_user_chat}></SideMenu>
+    <SideMenu style={{background:current_user_chat.username !==''?'#fff !important':'#1982fc'}} handleUnfriend={handleUnfriend} updateDisplaySettings={changeSettingsDisplay} CurrentUserChat={current_user_chat} UpdateCurrentUserChat={update_current_user_chat}></SideMenu>
     <div style={{flex: '1',position: 'relative',display:'flex',flexDirection: 'column',margin:'3% 0 0 2%',justifyContent: 'center',alignItems:'center',marginTop:'4%'}}>
       <ChatRoomHeader>
         <div style={{marginLeft:'5%',width:'50%',display:'flex',alignItems:'center',cursor:'pointer',flexDirection:'row'}} onClick={()=>{
@@ -152,11 +158,41 @@ const Chat = (props:any) => {
       </ChatRoomHeader>
     {current_user_chat.username !==''?
     <>
-      {settingsDisplay?
-      <Messageslist style={{display:'flex',justifyContent:'center'}}>
-        <h4 style={{color:'#1982fc'}}>{current_user_chat.username}</h4>
-      </Messageslist>:
-      <Messageslist id='MessageList'>
+    {settingsDisplay?
+      <Messageslist ref={msglist} style={{display:'flex',alignItems:'center',flexDirection:'column'}}>
+        <div style={{borderBottom:'1px solid #1982fc',height:'15%',width:'80%',textAlign:'center'}}>
+          <h4 style={{color:'#1982fc'}}>
+            {current_user_chat.username}
+          </h4>
+        </div>
+          {current_user_chat.type?
+            <LeaveButton>
+              Leave
+            </LeaveButton>
+              :
+          <div style={{width:'80%',display:'flex',flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
+            <LeaveButton style={{display:'flex',alignItems:'center'}} onClick={()=>{}}>
+              + Group with {current_user_chat.username} 
+              <CreateGroupIconLeave></CreateGroupIconLeave>
+            </LeaveButton>
+            <LeaveButton>
+              Profile
+              <UserIcon></UserIcon>
+            </LeaveButton>
+            <LeaveButton onClick={()=>handleUnfriend()} style={{background:'#fff',color:'#1982fc'}}>
+              Unfriend
+            </LeaveButton>
+            <LeaveButton style={{background:'#fff',color:'#1982fc'}}>
+              Block ✖
+            </LeaveButton>
+          </div> 
+          }
+        <div>
+
+        </div>
+      </Messageslist>
+        :
+      <Messageslist ref={msglist} id='MessageList'>
       <div style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center'}}>{messagelist.length===0?'No messages yet.':'You\'ve reached the end.'}</div>
         {messagelist.map(element => {
         let s = new Date(element.timesent)
@@ -221,7 +257,7 @@ const Chat = (props:any) => {
       </div>
   </>:
   <>
-  <Messageslist style={{color: '#000913',textAlign: 'center',alignItems: 'center',display: 'flex',flexDirection: 'column'}} id='MessageList'>
+  <Messageslist ref={msglist} style={{color: '#000913',textAlign: 'center',alignItems: 'center',display: 'flex',flexDirection: 'column'}} id='MessageList'>
     <div style={{marginTop:'10%'}}>
       <h2>Send messages to friends:</h2>
       <h4 style={{color: '#1982fc'}}>Choose a group or a friend from the contacts panel on your left.</h4>
