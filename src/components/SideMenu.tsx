@@ -26,35 +26,42 @@ const SideMenu = ({handleUnfriend,UpdateCurrentUserChat, updateDisplaySettings, 
       }))
   })
     .catch(err =>{console.error(err)})
-  },[handleUnfriend])
+  },[handleUnfriend,UpdateCurrentUserChat,CurrentUserChat,current_user])
   return(
     <Wrapper>
-      {friendslist.length !== 0 && grouplist.length !== 0 ?
-      <>
-      <div key={123} style={{position:'relative',color: '#1982fc',marginLeft:'5%',width:'100%',alignItems:'center',justifyContent: 'center'}}>
-        <h1>Contacts:</h1>
+      <div style={{position:'relative',color: '#1982fc',marginLeft:'5%',width:'100%',alignItems:'center',justifyContent: 'center'}}>
+          <h1>Contacts:</h1>
       </div>
         <ContactsList key={1321}>
+        {grouplist.length !== 0 &&
+        <>
         <h3 style={{margin:'0 0 0 5%'}}>
           Groups:
         </h3>
+        
           {grouplist.map((group:any) => {
             return (
             <div key={group.id+'wrapper'}>
               <UserFriend onClick={async() =>{
                 updateDisplaySettings(false)
-                await UpdateCurrentUserChat({username:group.name,room:group.id,type:true})
+                await UpdateCurrentUserChat({username:group.name,room:group.id,type:true,isCreator:group.creator===current_user?true:false,participants:group.participants})
                 }} key={group.id}>
                 <UserPic  src={'https://avatars.dicebear.com/api/initials/:'+group.name+'.svg'}></UserPic>
-                <div style={{position:'relative',margin:'10px',cursor:'pointer'}}>
+                <div style={{position:'relative',margin:'5px',cursor:'pointer'}}>
                   <h4>{group.name}</h4>
                 </div>
               </UserFriend>
-              <div style={{height:'1px',width:'100%',background:'#1982fc'}}></div>
             </div>
             )
           })}
-          <h3 style={{margin:'5% 0 0 5%'}}>Friends:</h3>
+          <div style={{height:'1px',width:'100%',background:'#1982fc'}}></div>
+          </>
+          }
+          {friendslist.length !== 0 &&
+            <h3 style={{margin:'5% 0 0 5%'}}>
+              Friends:
+            </h3>
+          }
           {friendslist.map((friend:any) => {
             var thisname = document.getElementById(friend['id'])
           return(
@@ -88,8 +95,6 @@ const SideMenu = ({handleUnfriend,UpdateCurrentUserChat, updateDisplaySettings, 
           )}
         )}
       </ContactsList>
-      </>
-      :undefined}
     </Wrapper>
   )
 }

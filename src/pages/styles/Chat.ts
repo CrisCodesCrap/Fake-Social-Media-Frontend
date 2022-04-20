@@ -104,6 +104,18 @@ transition: all 0.4s ease-in-out;
     transition: all 0.4s ease-in-out; 
 }
 `
+export const GroupMember = styled.div`
+border: 0px 1px 1px 0px solid #1982fc;
+width: 100%;
+padding: 4px;
+border-radius: 2px;
+margin: 1%;
+cursor: pointer;
+display: flex;
+flex-direction: row;
+align-items: center;
+height:50px;
+`
 export const UserIcon = styled(FaUser)`
     color: #fff;
     margin-left: 4px;
@@ -112,7 +124,7 @@ export const LeaveButton = styled.div`
     background: #1982fc;
     border: 1px solid #1982fc;
     border-radius: 12px;
-    padding:0.8%;
+    padding:1%;
     color: #fff;
     height: 20px;
     width: fit-content;

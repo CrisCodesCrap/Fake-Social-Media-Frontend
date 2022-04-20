@@ -1,6 +1,6 @@
 import axios from "axios"
 import {useEffect, useRef, useState} from "react"
-import {Message,MessageWrapper,Messageslist,LeaveButton,Msginput,Sendbtn,UserPic,SmileIcon, ChatRoomHeader, CreateGroupIcon, ChatRoomSettingsIcon, CreateGroupButton, UserIcon, CreateGroupIconLeave } from './styles/Chat'
+import {Message,MessageWrapper,Messageslist,LeaveButton,Msginput,Sendbtn,UserPic,SmileIcon, ChatRoomHeader, CreateGroupIcon, ChatRoomSettingsIcon, CreateGroupButton, UserIcon, CreateGroupIconLeave, GroupMember } from './styles/Chat'
 import moment from "moment"
 import { useNavigate } from "react-router"
 import tippy from 'tippy.js';
@@ -26,15 +26,22 @@ const Chat = (props:any) => {
   const msglist = useRef<any>(null)
   const [showCreateGroup,updateShowCreateGroup] = useState<boolean>(false)
   const [chosenEmoji,setChosenEmoji] = useState<any>('')
-  const [current_user_chat, update_current_user_chat] = useState<any>({username:'',room:0,type:undefined})
+  const [current_user_chat, update_current_user_chat] = useState<any>({username:'',room:0,type:undefined,isCreator:false,participants:[]})
   const [last_seen,update_last_seen] = useState<any>(undefined)
+  const [participants, updateParticipants] = useState<any[]>([])
+  const [chooseKick, updateChooseKick] = useState<any[]>([])
+  const kickUserHandler = (user:any) =>{
+    chooseKick.includes(user) && updateChooseKick(chooseKick.filter((u:any) => u !== user))
+    !chooseKick.includes(user) && updateChooseKick([...chooseKick,user])
+  }
   const handleSend = async()=>{
     if(message!==undefined && message !== ''){
+    changeSettingsDisplay(false)
     let msg = {'sender':current_user,'content':message,'room':current_user_chat.room,'type':current_user_chat.type}
     await axios.post('http://127.0.0.1:8000/send_msg',msg)
     .then(async response =>{
       await axios.post('http://127.0.0.1:4000/send_msg',response.data)
-      .catch(err =>console.log(err))
+      .catch(err =>console.error(err))
       update_message('')
       if(msglist.current !== null){
         set_displayEmojiMenu(false)
@@ -58,8 +65,13 @@ const Chat = (props:any) => {
         if(msglist.current !== null){
           set_displayEmojiMenu(false)
           if(current_user_chat.room === e.room) { 
+            if(msglist.current.scrollTop = msglist.current.scrollHeight){
             update_messagelist(messagelist=>[...messagelist,e])
             msglist.current.scrollTop = msglist.current.scrollHeight
+          }else{
+            update_messagelist(messagelist=>[...messagelist,e])
+          }
+            
         }
       }
     }
@@ -68,7 +80,7 @@ const Chat = (props:any) => {
     return () => {
       socket.disconnect()
   }
-  },[current_user_chat])
+  },[current_user_chat,current_user])
   useEffect(()=>{
     const element:any = document.getElementById('MessageList')
     current_user_chat.type !== undefined && axios.post('http://127.0.0.1:8000/get_msg',{'room':current_user_chat.room,'isgroup':current_user_chat.type})
@@ -94,13 +106,15 @@ const Chat = (props:any) => {
     }
     window.addEventListener('resize',handleResize)
     update_textwidth(msglist.current.clientWidth)
+    updateParticipants(current_user_chat.participants)
     return ()=> window.removeEventListener('resize',handleResize)  
-    },[current_user_chat,update_current_user_chat, changeSettingsDisplay])
+    },[current_user_chat,update_current_user_chat, changeSettingsDisplay,current_user])
     const handleUnfriend = async () => {
       const unfriendurl = 'http://localhost:8000/unfriend/'+current_user_chat.username
-      await axios.post(unfriendurl,{'username':current_user_chat.username,'friend':current_user_chat.username})	
-      .then(response => {
-        if(response.data['status'] === 'success'){
+      await axios.post(unfriendurl,{'username':current_user,'friend':current_user_chat.username})	
+      .then(async response  => {
+        if(response.data['code'] === 'success'){
+          update_current_user_chat({username:'',room:0,type:undefined})
         }
       })
     }
@@ -121,16 +135,17 @@ const Chat = (props:any) => {
           }
          }}>
           {current_user_chat.username!==''&&
+          <>
             <UserPic style={{height:'40px',width:'40px',marginRight:'2.5%'}} draggable={false} src={'https://avatars.dicebear.com/api/initials/:'+current_user_chat.username+'.svg'}>
             </UserPic>
+            <div style={{display:'flex',flexDirection:'column',alignItems:'baseline'}}>
+                {current_user_chat.username}
+              <div style={{color:'#023774',fontSize:'small',display:'flex'}}>
+                {last_seen !== undefined && !current_user_chat.type &&'Last seen: '+ moment(last_seen).fromNow()}
+              </div>
+            </div>
+          </>
           }
-          <div style={{display:'flex',flexDirection:'column',alignItems:'baseline'}}>
-            {current_user_chat.username}
-            <div style={{color:'#023774',fontSize:'small',display:'flex'}}>
-            {last_seen !== undefined && !current_user_chat.type &&'Last seen: '+ moment(last_seen).fromNow()}
-          </div>
-          </div>
-          
         </div>
         <div style={{width:'50%'}}>
         {current_user_chat.username!==''&&
@@ -166,24 +181,75 @@ const Chat = (props:any) => {
           </h4>
         </div>
           {current_user_chat.type?
-            <LeaveButton>
-              Leave
-            </LeaveButton>
-              :
+          <>
           <div style={{width:'80%',display:'flex',flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
-            <LeaveButton style={{display:'flex',alignItems:'center'}} onClick={()=>{}}>
+          </div>
+          {current_user_chat.isCreator&&
+          <>
+            <h4 style={{color:'#1982fc'}}>List of users:</h4>
+            <div style={{width:'60%',display:'flex',flexDirection:'column',alignItems:'center',borderBottom:'1px solid #1982fc',borderTop:'1px solid #1982fc'}}>
+               {participants.map((participant:any)=>{
+                if(participant === current_user) {
+                  return(
+                    <GroupMember draggable={false} style={{background:chooseKick.includes(participant)?'#1982fc':'#fff'}} key={participant+'wrapper'}>
+                      <UserPic src={'https://avatars.dicebear.com/api/initials/:'+participant+'.svg'}></UserPic>
+                      <div  style={{margin:'3%',color:chooseKick.includes(participant)?'#fff':'#1982fc'}}>{participant} (you)</div>
+                    </GroupMember>
+                  ) 
+                }
+                else{
+                return(
+                    <GroupMember draggable={false} style={{background:chooseKick.includes(participant)?'#1982fc':'#fff'}} onClick={()=>kickUserHandler(participant)}  key={participant+'wrapper'}>
+                      <UserPic  src={'https://avatars.dicebear.com/api/initials/:'+participant+'.svg'}></UserPic>
+                      <div style={{margin:'3%',color:chooseKick.includes(participant)?'#fff':'#1982fc'}}>{participant}</div>
+                    </GroupMember>
+                    )
+                      }
+                    }
+                  )
+                }
+            </div>
+          </>  
+            }   
+            {!current_user_chat.isCreator?
+              <LeaveButton>
+                Leave
+              </LeaveButton>
+              :
+              <div style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'end',width:'60%'}}>
+                <LeaveButton>
+                  Add +
+                </LeaveButton>
+                {chooseKick.length>0&&
+                  <LeaveButton>
+                  Kick selected
+                </LeaveButton>
+                }
+                <LeaveButton style={{color:'#1982fc',background:'#fff'}}>
+                  Delete the group
+                </LeaveButton>
+              </div>
+            }
+            </>
+                :
+          <div style={{width:'80%',display:'flex',flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
+            <LeaveButton style={{display:'flex',alignItems:'center'}} onClick={()=>{
+              updateShowCreateGroup(true)
+              
+            }}>
               + Group with {current_user_chat.username} 
               <CreateGroupIconLeave></CreateGroupIconLeave>
             </LeaveButton>
-            <LeaveButton>
+            <LeaveButton onClick={()=>{
+              const navurl = '/users/'+current_user_chat.username
+              navigate(navurl)
+            }
+            }>
               Profile
               <UserIcon></UserIcon>
             </LeaveButton>
             <LeaveButton onClick={()=>handleUnfriend()} style={{background:'#fff',color:'#1982fc'}}>
               Unfriend
-            </LeaveButton>
-            <LeaveButton style={{background:'#fff',color:'#1982fc'}}>
-              Block ✖
             </LeaveButton>
           </div> 
           }

@@ -20,5 +20,5 @@ export const UserFriend = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 10px;
+    margin: 4px;
 `
