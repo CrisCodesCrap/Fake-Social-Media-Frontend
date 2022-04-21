@@ -11,14 +11,12 @@ const CreateGroup = (props:any):ReactElement => {
   
   async function createGroupHandler() {
     if(selectedUsers.length === 0) return
-    let groupMembers = [...selectedUsers,props.currentUser]
+    let groupMembers:string[] = [...selectedUsers,props.currentUser]
     let currentUserUrl = 'http://localhost:8000/create_group/'+props.currentUser
     await axios.post(currentUserUrl, {
       'groupName': groupName,
       'userCreator': props.currentUser,
       'groupMembers': groupMembers
-    }).then(res => {
-      console.log(res)
     })
     props.updateShowCreateGroup(false)
   }
@@ -36,11 +34,9 @@ const CreateGroup = (props:any):ReactElement => {
   function selectUser(user:string){
     if(selectedUsers.includes(user)){
       updateSelectedUsers(selectedUsers.filter(selectedUser => selectedUser !== user))
-      console.log(selectedUsers)
     }
     else{
       updateSelectedUsers([...selectedUsers, user])
-      console.log(selectedUsers)
     }
   }
   function handleGroupNameChange(e:any) {
@@ -85,7 +81,7 @@ const CreateGroup = (props:any):ReactElement => {
             </GroupInput>
           </WindowContent>
           <WindowContentMini>    
-            <Header>Add users:</Header>
+
             <div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'46px',borderBottom:'1px solid #1982fc'}}>
               
               {!showCross&&

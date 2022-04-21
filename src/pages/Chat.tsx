@@ -10,6 +10,7 @@ import { useNotifications } from '@mantine/notifications';
 import {io} from 'socket.io-client'
 import SideMenu from "../components/SideMenu"
 import CreateGroup from "../components/CreateGroup"
+import AddUser from "../components/AddUser"
 /*
 Needs recent messages to be implemented.
 Can be done with the help of the socket.io event listener in the useEffect down below.
@@ -17,6 +18,7 @@ Idea is to listen for new messages and have some kind of an object for each chan
 Good look!
 */
 const Chat = (props:any) => {
+  const current_user = localStorage.getItem('user')
   const [message,update_message] = useState<any>('')
   const notifications = useNotifications()
   const [messagelist,update_messagelist] = useState<any[]>([])
@@ -26,13 +28,35 @@ const Chat = (props:any) => {
   const msglist = useRef<any>(null)
   const [showCreateGroup,updateShowCreateGroup] = useState<boolean>(false)
   const [chosenEmoji,setChosenEmoji] = useState<any>('')
-  const [current_user_chat, update_current_user_chat] = useState<any>({username:'',room:0,type:undefined,isCreator:false,participants:[]})
+  const [current_user_chat, update_current_user_chat] = useState<any>({username:'',room:0,type:undefined,isCreator:false,participants:[],created:0})
   const [last_seen,update_last_seen] = useState<any>(undefined)
   const [participants, updateParticipants] = useState<any[]>([])
-  const [chooseKick, updateChooseKick] = useState<any[]>([])
+  const [chooseKick, updateChooseKick] = useState<string[]>([])
+  const [showAddUser,updateShowAddUser] = useState<boolean>(false)
+  const leaveHandler = async () => {
+    const groupLeaveUrl = 'http://localhost:8000/leaveGroup/'+current_user
+    await axios.post(groupLeaveUrl,{'username':current_user,'room':current_user_chat.room,'isAdmin':current_user_chat.isCreator})
+    .then(response => {
+      update_current_user_chat({username:'',room:0,type:undefined,isCreator:false,participants:[],created:0})
+      axios.post('http://127.0.0.1:4000/send_msg',response.data)
+    })
+  }
+  const kickSelectedHandler = async () => {
+    const kickUrl = 'http://localhost:8000/kickUsers/'+current_user
+    await axios.post(kickUrl,{'username':current_user,'id':current_user_chat.room,'remove':chooseKick})
+    .then(response => {
+      updateChooseKick([])
+      updateShowAddUser(false)
+      axios.post('http://127.0.0.1:4000/send_msg',response.data)
+    })
+    .catch(error => {
+      console.log(error)
+    })
+  }
   const kickUserHandler = (user:any) =>{
     chooseKick.includes(user) && updateChooseKick(chooseKick.filter((u:any) => u !== user))
     !chooseKick.includes(user) && updateChooseKick([...chooseKick,user])
+    
   }
   const handleSend = async()=>{
     if(message!==undefined && message !== ''){
@@ -56,7 +80,6 @@ const Chat = (props:any) => {
     setChosenEmoji(emojiObject)
     emojiObject.emoji !== undefined && emojiObject.emoji !== 'undefined' && update_message(message+emojiObject.emoji)
   }
-  const current_user = localStorage.getItem('user')
   useEffect(() => {
     const socket = io('http://127.0.0.1:4000/')
     socket.on('message',(e)=>{
@@ -124,8 +147,12 @@ const Chat = (props:any) => {
       <CreateGroup currentUserChat={current_user_chat} currentUser={current_user} updateShowCreateGroup={updateShowCreateGroup}>
       </CreateGroup>
     }
+    {showAddUser &&
+      <AddUser updateShowAddUser={updateShowAddUser} currentUser={current_user} currentUserChat={current_user_chat}>
+      </AddUser>
+    }
     <div style={{display: 'flex',flexDirection:'row'}}>
-    <SideMenu style={{background:current_user_chat.username !==''?'#fff !important':'#1982fc'}} handleUnfriend={handleUnfriend} updateDisplaySettings={changeSettingsDisplay} CurrentUserChat={current_user_chat} UpdateCurrentUserChat={update_current_user_chat}></SideMenu>
+    <SideMenu style={{background:current_user_chat.username !==''?'#fff !important':'#1982fc'}} handleLeaveGroup={leaveHandler} handleUnfriend={handleUnfriend} updateDisplaySettings={changeSettingsDisplay} CurrentUserChat={current_user_chat} UpdateCurrentUserChat={update_current_user_chat}></SideMenu>
     <div style={{flex: '1',position: 'relative',display:'flex',flexDirection: 'column',margin:'3% 0 0 2%',justifyContent: 'center',alignItems:'center',marginTop:'4%'}}>
       <ChatRoomHeader>
         <div style={{marginLeft:'5%',width:'50%',display:'flex',alignItems:'center',cursor:'pointer',flexDirection:'row'}} onClick={()=>{
@@ -212,19 +239,22 @@ const Chat = (props:any) => {
           </>  
             }   
             {!current_user_chat.isCreator?
-              <LeaveButton>
-                Leave
-              </LeaveButton>
+            <LeaveButton onClick={leaveHandler} style={{color:'#1982fc',background:'#fff'}}>
+              Leave
+            </LeaveButton>
               :
               <div style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'end',width:'60%'}}>
-                <LeaveButton>
+                <LeaveButton onClick={()=>updateShowAddUser(true)}>
                   Add +
                 </LeaveButton>
                 {chooseKick.length>0&&
-                  <LeaveButton>
+                  <LeaveButton onClick={()=>kickSelectedHandler()}>
                   Kick selected
                 </LeaveButton>
                 }
+              <LeaveButton onClick={leaveHandler} style={{color:'#1982fc',background:'#fff'}}>
+                Leave
+              </LeaveButton>
                 <LeaveButton style={{color:'#1982fc',background:'#fff'}}>
                   Delete the group
                 </LeaveButton>
@@ -257,13 +287,18 @@ const Chat = (props:any) => {
 
         </div>
       </Messageslist>
-        :
+    :
       <Messageslist ref={msglist} id='MessageList'>
-      <div style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center'}}>{messagelist.length===0?'No messages yet.':'You\'ve reached the end.'}</div>
+      <div style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center',fontWeight:'300'}}>
+        Group was created {moment(current_user_chat.created).fromNow()}
+      </div>
+      <div style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center',fontWeight:'300'}}>
+        {messagelist.length===0?'No messages yet.':'You\'ve reached the end.'}
+      </div>
         {messagelist.map(element => {
         let s = new Date(element.timesent)
         var thisname = document.getElementById(element.id)
-      if(element.sender === current_user){
+      if(element.sender === current_user && !element.isCommand){
       return(
       <MessageWrapper key={element.id+'wrapper'} style={{justifyContent: 'end'}}>
       <Message key={element.id} style={{marginRight: '5px',background:'#CDE4FE',color:'#000913',clear:'both'}}>{element.content}<br></br><div style={{fontWeight:'600',fontSize:'x-small',color:'#000',textAlign:'start'}}>Sent by {element.sender === current_user ? 'you' : element.sender} {moment(s).fromNow()}</div></Message>
@@ -282,6 +317,7 @@ const Chat = (props:any) => {
       </UserPic>
       </MessageWrapper>
       )}
+    if(!element.isCommand && element.sender !== current_user){
     return(
       <MessageWrapper key={element.id+'wrapper'}>
         <UserPic style={{userSelect:'none'}} key={element.id+'icon'} id={element.id} onMouseOver={()=>{
@@ -299,7 +335,13 @@ const Chat = (props:any) => {
         </UserPic>
         <Message key={element.id} style={{marginLeft:'5px',background:'#3ABEFF',color:'white',clear:'both'}}>{element.content}<br></br><div style={{fontWeight:'600',fontSize:'x-small',color:'#000',textAlign:'start'}}>Sent by {element.sender === current_user ? 'you' : element.sender} {moment(s).fromNow()}</div></Message>
       </MessageWrapper>
-    )})}
+    )}
+      return(
+        <div key={element.id+'command'} style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center',fontWeight:'300'}}>
+          {element.content} {moment(element.timesent).fromNow()}.
+        </div>
+      )
+    })}
     </Messageslist>
     }
       <div style={{width:textwidth-6+'px',display: 'flex',textAlign:'center',alignItems: 'center',justifyContent: 'space-evenly',borderRadius:'6px',padding:'5px',border:'1px solid #1982FC'}}>

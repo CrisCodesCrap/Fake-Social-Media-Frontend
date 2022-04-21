@@ -47,7 +47,7 @@ export const Sendbtn = styled.button`
 export const MessageWrapper = styled.div`
 display: flex;
 align-items: center;
-margin: 50px;
+margin: 40px;
 ` 
 export const ChatRoomHeader = styled.div`
     border: 1px solid #1982FC;

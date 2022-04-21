@@ -5,7 +5,7 @@ import { UserPic } from '../pages/styles/Chat'
 import moment from 'moment'
 import '../pages/styles/tippytooltip.css'
 import tippy from 'tippy.js'
-const SideMenu = ({handleUnfriend,UpdateCurrentUserChat, updateDisplaySettings, CurrentUserChat}:any):ReactElement => {
+const SideMenu = ({handleUnfriend,UpdateCurrentUserChat, updateDisplaySettings, CurrentUserChat,handleLeaveGroup}:any):ReactElement => {
   const [friendslist, update_friendslist] = useState<any[]>([])
   const [grouplist, updateGrouplist] = useState<any[]>([])
   const current_user = localStorage.getItem('user')
@@ -26,25 +26,24 @@ const SideMenu = ({handleUnfriend,UpdateCurrentUserChat, updateDisplaySettings, 
       }))
   })
     .catch(err =>{console.error(err)})
-  },[handleUnfriend,UpdateCurrentUserChat,CurrentUserChat,current_user])
+  },[handleUnfriend,UpdateCurrentUserChat,CurrentUserChat,current_user,handleLeaveGroup])
   return(
     <Wrapper>
       <div style={{position:'relative',color: '#1982fc',marginLeft:'5%',width:'100%',alignItems:'center',justifyContent: 'center'}}>
           <h1>Contacts:</h1>
       </div>
-        <ContactsList key={1321}>
+        <ContactsList>
         {grouplist.length !== 0 &&
         <>
         <h3 style={{margin:'0 0 0 5%'}}>
           Groups:
         </h3>
-        
           {grouplist.map((group:any) => {
             return (
             <div key={group.id+'wrapper'}>
               <UserFriend onClick={async() =>{
                 updateDisplaySettings(false)
-                await UpdateCurrentUserChat({username:group.name,room:group.id,type:true,isCreator:group.creator===current_user?true:false,participants:group.participants})
+                await UpdateCurrentUserChat({username:group.name,room:group.id,type:true,isCreator:group.admin===current_user?true:false,participants:group.participants,created:group.timecreated})
                 }} key={group.id}>
                 <UserPic  src={'https://avatars.dicebear.com/api/initials/:'+group.name+'.svg'}></UserPic>
                 <div style={{position:'relative',margin:'5px',cursor:'pointer'}}>

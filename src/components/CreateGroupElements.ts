@@ -81,7 +81,7 @@ height: 50%;
 border-radius: 12px 12px 6px 6px;
 border: 1px solid #1982fc;
 align-items: start;
-margin:2% 0 0 10%;
+margin:10% 0 0 10%;
 `
 export const Search = styled(FaSearch)`
 width: 20px;
