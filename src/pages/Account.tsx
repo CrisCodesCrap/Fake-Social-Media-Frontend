@@ -1,16 +1,17 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {PageWrapper,Wrapper,UserPic,Username,AccountWrapper, SendFriendRequestBtn, AcceptRequestBtn, DeclineRequestBtn} from './styles/Account'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams} from 'react-router-dom'
 import axios from 'axios'
 import tippy from 'tippy.js'
 import './styles/tippytooltip.css'
 import moment from 'moment'
 
-const Account = () => {
+const Account = ({updateCurrentChat}:any) => {
   var descript:any
   const {username} = useParams()
   const btnref = useRef(0)
   const [buttontext, update_buttontext] = useState<any>()
+  const navigate = useNavigate()
   const [isonline,updatestatus] = useState<any>(  
   {
     isOnline:false,
@@ -19,6 +20,10 @@ const Account = () => {
     isPresent:false,
     isFromMe:false
   })
+  const chatWithThisUserHandler = async ()=>{
+    await updateCurrentChat({username:username,room:isonline.room,type:false})
+    navigate('/Messages')
+  }
   const current_user = localStorage.getItem('user')
   const online_url_check = 'http://localhost:8000/check_online_status/'+username
   useEffect(()=>{
@@ -30,7 +35,8 @@ const Account = () => {
           lastSeen: response.data['lastSeen'],
           areFriends: response.data['areFriends'],
           isPresent: response.data['isPresent'],
-          isFromMe: response.data['isFromMe']
+          isFromMe: response.data['isFromMe'],
+          room: response.data['room']
         }
       )
     })
@@ -129,6 +135,12 @@ const Account = () => {
       <Username>{username}</Username></div>
         <div>{stsdesc}</div>
         <div style={{color: '#000913'}}>Last seen: {!isonline.isOnline?moment(isonline.last_seen).fromNow():'now'}</div>
+        {buttontext === 'Remove Friend'&&
+            <SendFriendRequestBtn onClick={()=>chatWithThisUserHandler()} style={{marginTop:'25px'}}>
+              Send Message
+          </SendFriendRequestBtn>
+          }
+          <br></br>
           {!isonline.isFromMe && isonline.isPresent?
           <>
             <AcceptRequestBtn onClick={()=>{username !== undefined && handleAnswerRequest(true,username)}}>

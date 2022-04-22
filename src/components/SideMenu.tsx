@@ -12,7 +12,7 @@ const SideMenu = ({handleUnfriend,UpdateCurrentUserChat, updateDisplaySettings, 
   useEffect(() =>{
     const urlFriends = 'http://localhost:8000/get_friendlist/'+current_user
     const urlGroups = 'http://localhost:8000/get_groups/'+current_user
-    axios.post(urlGroups,{'username':current_user})
+    current_user !== null && axios.post(urlGroups,{'username':current_user})
     .then(response =>{
       updateGrouplist(response.data['groups'])
     })
@@ -30,7 +30,9 @@ const SideMenu = ({handleUnfriend,UpdateCurrentUserChat, updateDisplaySettings, 
   return(
     <Wrapper>
       <div style={{position:'relative',color: '#1982fc',marginLeft:'5%',width:'100%',alignItems:'center',justifyContent: 'center'}}>
-          <h1>Contacts:</h1>
+          {current_user !== null &&
+            <h1>Contacts:</h1>
+          }
       </div>
         <ContactsList>
         {grouplist.length !== 0 &&
@@ -43,7 +45,7 @@ const SideMenu = ({handleUnfriend,UpdateCurrentUserChat, updateDisplaySettings, 
             <div key={group.id+'wrapper'}>
               <UserFriend onClick={async() =>{
                 updateDisplaySettings(false)
-                await UpdateCurrentUserChat({username:group.name,room:group.id,type:true,isCreator:group.admin===current_user?true:false,participants:group.participants,created:group.timecreated})
+                await UpdateCurrentUserChat({username:group.name,room:group.id,type:true,admin:group.admin,isCreator:group.admin===current_user?true:false,participants:group.participants,created:group.timecreated})
                 }} key={group.id}>
                 <UserPic  src={'https://avatars.dicebear.com/api/initials/:'+group.name+'.svg'}></UserPic>
                 <div style={{position:'relative',margin:'5px',cursor:'pointer'}}>

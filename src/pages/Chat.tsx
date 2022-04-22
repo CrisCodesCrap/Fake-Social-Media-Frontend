@@ -11,12 +11,8 @@ import {io} from 'socket.io-client'
 import SideMenu from "../components/SideMenu"
 import CreateGroup from "../components/CreateGroup"
 import AddUser from "../components/AddUser"
-/*
-Needs recent messages to be implemented.
-Can be done with the help of the socket.io event listener in the useEffect down below.
-Idea is to listen for new messages and have some kind of an object for each channel and update the messages and if they are seen by the user or not.
-Good look!
-*/
+import AreYouSureWindow from "../components/AreYouSureWindow"
+
 const Chat = (props:any) => {
   const current_user = localStorage.getItem('user')
   const [message,update_message] = useState<any>('')
@@ -28,18 +24,29 @@ const Chat = (props:any) => {
   const msglist = useRef<any>(null)
   const [showCreateGroup,updateShowCreateGroup] = useState<boolean>(false)
   const [chosenEmoji,setChosenEmoji] = useState<any>('')
-  const [current_user_chat, update_current_user_chat] = useState<any>({username:'',room:0,type:undefined,isCreator:false,participants:[],created:0})
+  const [current_user_chat, update_current_user_chat] = useState<any>({username:'',room:0,type:undefined,admin:'',isCreator:false,participants:[],created:new Date()})
   const [last_seen,update_last_seen] = useState<any>(undefined)
   const [participants, updateParticipants] = useState<any[]>([])
   const [chooseKick, updateChooseKick] = useState<string[]>([])
   const [showAddUser,updateShowAddUser] = useState<boolean>(false)
+  const [showSure, updateShowSure] = useState<boolean>(false)
+  const [isLeaving, updateIsLeaving] = useState<boolean>(false)
+  
+  const deleteGroupHandler = async () => {
+    updateShowSure(true)
+  }
   const leaveHandler = async () => {
-    const groupLeaveUrl = 'http://localhost:8000/leaveGroup/'+current_user
-    await axios.post(groupLeaveUrl,{'username':current_user,'room':current_user_chat.room,'isAdmin':current_user_chat.isCreator})
-    .then(response => {
-      update_current_user_chat({username:'',room:0,type:undefined,isCreator:false,participants:[],created:0})
-      axios.post('http://127.0.0.1:4000/send_msg',response.data)
-    })
+    if(current_user_chat.participants.length === 1){
+      updateIsLeaving(true)
+      updateShowSure(true)
+    }else{
+      const groupLeaveUrl = 'http://localhost:8000/leaveGroup/'+current_user
+        await axios.post(groupLeaveUrl,{'username':current_user,'room':current_user_chat.room,'isAdmin':current_user_chat.isCreator})
+        .then(response => {
+          update_current_user_chat({username:'',room:0,type:undefined,isCreator:false,participants:[],created:0})
+          axios.post('http://127.0.0.1:4000/send_msg',response.data)
+        })
+    }
   }
   const kickSelectedHandler = async () => {
     const kickUrl = 'http://localhost:8000/kickUsers/'+current_user
@@ -47,16 +54,24 @@ const Chat = (props:any) => {
     .then(response => {
       updateChooseKick([])
       updateShowAddUser(false)
+        update_current_user_chat(
+          {username:current_user_chat.username,
+            room:current_user_chat.room,
+            type:current_user_chat.type,
+            admin:current_user_chat.admin,
+            isCreator:current_user_chat.isCreator,
+            created:current_user_chat.created,
+            participants:current_user_chat.participants.filter((user:any)=>!chooseKick.includes(user))
+      })
       axios.post('http://127.0.0.1:4000/send_msg',response.data)
     })
     .catch(error => {
-      console.log(error)
+      console.error(error)
     })
   }
-  const kickUserHandler = (user:any) =>{
-    chooseKick.includes(user) && updateChooseKick(chooseKick.filter((u:any) => u !== user))
+  const kickUserHandler = (user:string) =>{
+    chooseKick.includes(user) && updateChooseKick(chooseKick.filter((u:string) => u !== user))
     !chooseKick.includes(user) && updateChooseKick([...chooseKick,user])
-    
   }
   const handleSend = async()=>{
     if(message!==undefined && message !== ''){
@@ -80,6 +95,9 @@ const Chat = (props:any) => {
     setChosenEmoji(emojiObject)
     emojiObject.emoji !== undefined && emojiObject.emoji !== 'undefined' && update_message(message+emojiObject.emoji)
   }
+  useEffect(()=>{
+    props.ParentCurrentChat !== null && update_current_user_chat(props.ParentCurrentChat)
+  },[])
   useEffect(() => {
     const socket = io('http://127.0.0.1:4000/')
     socket.on('message',(e)=>{
@@ -88,7 +106,7 @@ const Chat = (props:any) => {
         if(msglist.current !== null){
           set_displayEmojiMenu(false)
           if(current_user_chat.room === e.room) { 
-            if(msglist.current.scrollTop = msglist.current.scrollHeight){
+            if(msglist.current.scrollTop === msglist.current.scrollHeight){
             update_messagelist(messagelist=>[...messagelist,e])
             msglist.current.scrollTop = msglist.current.scrollHeight
           }else{
@@ -104,6 +122,9 @@ const Chat = (props:any) => {
       socket.disconnect()
   }
   },[current_user_chat,current_user])
+  useEffect(() => {
+    msglist.current.scrollTop = msglist.current.scrollHeight
+  },[changeSettingsDisplay,settingsDisplay])
   useEffect(()=>{
     const element:any = document.getElementById('MessageList')
     current_user_chat.type !== undefined && axios.post('http://127.0.0.1:8000/get_msg',{'room':current_user_chat.room,'isgroup':current_user_chat.type})
@@ -132,6 +153,7 @@ const Chat = (props:any) => {
     updateParticipants(current_user_chat.participants)
     return ()=> window.removeEventListener('resize',handleResize)  
     },[current_user_chat,update_current_user_chat, changeSettingsDisplay,current_user])
+    
     const handleUnfriend = async () => {
       const unfriendurl = 'http://localhost:8000/unfriend/'+current_user_chat.username
       await axios.post(unfriendurl,{'username':current_user,'friend':current_user_chat.username})	
@@ -148,8 +170,12 @@ const Chat = (props:any) => {
       </CreateGroup>
     }
     {showAddUser &&
-      <AddUser updateShowAddUser={updateShowAddUser} currentUser={current_user} currentUserChat={current_user_chat}>
+      <AddUser updateCurrentUserChat={update_current_user_chat} updateShowAddUser={updateShowAddUser} currentUser={current_user} currentUserChat={current_user_chat}>
       </AddUser>
+    }
+    {showSure &&
+      <AreYouSureWindow isLeaving={isLeaving} updateShowSure={updateShowSure} current_user={current_user} current_user_chat={current_user_chat} update_current_user_chat={update_current_user_chat}>
+      </AreYouSureWindow>
     }
     <div style={{display: 'flex',flexDirection:'row'}}>
     <SideMenu style={{background:current_user_chat.username !==''?'#fff !important':'#1982fc'}} handleLeaveGroup={leaveHandler} handleUnfriend={handleUnfriend} updateDisplaySettings={changeSettingsDisplay} CurrentUserChat={current_user_chat} UpdateCurrentUserChat={update_current_user_chat}></SideMenu>
@@ -159,6 +185,9 @@ const Chat = (props:any) => {
           if(!current_user_chat.type) {
             let user_address = '/users/'+current_user_chat.username
             navigate(user_address)
+          }
+          else{
+            changeSettingsDisplay(!settingsDisplay)
           }
          }}>
           {current_user_chat.username!==''&&
@@ -211,7 +240,7 @@ const Chat = (props:any) => {
           <>
           <div style={{width:'80%',display:'flex',flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
           </div>
-          {current_user_chat.isCreator&&
+          {current_user_chat.isCreator?
           <>
             <h4 style={{color:'#1982fc'}}>List of users:</h4>
             <div style={{width:'60%',display:'flex',flexDirection:'column',alignItems:'center',borderBottom:'1px solid #1982fc',borderTop:'1px solid #1982fc'}}>
@@ -220,7 +249,7 @@ const Chat = (props:any) => {
                   return(
                     <GroupMember draggable={false} style={{background:chooseKick.includes(participant)?'#1982fc':'#fff'}} key={participant+'wrapper'}>
                       <UserPic src={'https://avatars.dicebear.com/api/initials/:'+participant+'.svg'}></UserPic>
-                      <div  style={{margin:'3%',color:chooseKick.includes(participant)?'#fff':'#1982fc'}}>{participant} (you)</div>
+                      <div  style={{margin:'3%',color:chooseKick.includes(participant)?'#fff':'#1982fc'}}>{participant} (you) {current_user_chat.isCreator&&'(admin)'}</div>
                     </GroupMember>
                   ) 
                 }
@@ -237,11 +266,42 @@ const Chat = (props:any) => {
                 }
             </div>
           </>  
-            }   
+          :
+          <>
+            <h4 style={{color:'#1982fc'}}>List of users:</h4>
+            <div style={{width:'60%',display:'flex',flexDirection:'column',alignItems:'center',borderBottom:'1px solid #1982fc',borderTop:'1px solid #1982fc'}}>
+               {participants.map((participant:any)=>{
+                if(participant === current_user) {
+                  return(
+                    <GroupMember draggable={false} style={{color:"#1982fc"}} key={participant+'wrapper'}>
+                      <UserPic src={'https://avatars.dicebear.com/api/initials/:'+participant+'.svg'}></UserPic>
+                      <div  style={{margin:'3%'}}>{participant} (you)</div>
+                    </GroupMember>
+                  ) 
+                }
+                else{
+                  return(
+                    <GroupMember style={{color:"#1982fc"}} draggable={false} key={participant+'wrapper'}>
+                      <UserPic  src={'https://avatars.dicebear.com/api/initials/:'+participant+'.svg'}></UserPic>
+                      <div style={{margin:'3%'}}>{participant} {current_user_chat.admin===participant&&'(admin)'}</div>
+                    </GroupMember>
+                    )
+                      }
+                    }
+                  )
+                }
+            </div>
+          </>  
+          }   
             {!current_user_chat.isCreator?
-            <LeaveButton onClick={leaveHandler} style={{color:'#1982fc',background:'#fff'}}>
-              Leave
-            </LeaveButton>
+            <div style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'end',width:'60%'}}>
+              <LeaveButton onClick={()=>updateShowAddUser(true)}>
+                Add +
+              </LeaveButton>
+              <LeaveButton onClick={()=>leaveHandler()} style={{color:'#1982fc',background:'#fff'}}>
+                Leave
+              </LeaveButton>
+            </div>
               :
               <div style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'end',width:'60%'}}>
                 <LeaveButton onClick={()=>updateShowAddUser(true)}>
@@ -255,7 +315,7 @@ const Chat = (props:any) => {
               <LeaveButton onClick={leaveHandler} style={{color:'#1982fc',background:'#fff'}}>
                 Leave
               </LeaveButton>
-                <LeaveButton style={{color:'#1982fc',background:'#fff'}}>
+                <LeaveButton onClick={deleteGroupHandler} style={{color:'#1982fc',background:'#fff'}}>
                   Delete the group
                 </LeaveButton>
               </div>
@@ -265,7 +325,6 @@ const Chat = (props:any) => {
           <div style={{width:'80%',display:'flex',flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
             <LeaveButton style={{display:'flex',alignItems:'center'}} onClick={()=>{
               updateShowCreateGroup(true)
-              
             }}>
               + Group with {current_user_chat.username} 
               <CreateGroupIconLeave></CreateGroupIconLeave>
@@ -273,7 +332,7 @@ const Chat = (props:any) => {
             <LeaveButton onClick={()=>{
               const navurl = '/users/'+current_user_chat.username
               navigate(navurl)
-            }
+              }
             }>
               Profile
               <UserIcon></UserIcon>
@@ -289,9 +348,11 @@ const Chat = (props:any) => {
       </Messageslist>
     :
       <Messageslist ref={msglist} id='MessageList'>
-      <div style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center',fontWeight:'300'}}>
+      {current_user_chat.type&&
+        <div style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center',fontWeight:'300'}}>
         Group was created {moment(current_user_chat.created).fromNow()}
       </div>
+      }
       <div style={{display:'flex',justifyContent:'center',color:'gray',marginTop:'3%',alignItems:'center',fontWeight:'300'}}>
         {messagelist.length===0?'No messages yet.':'You\'ve reached the end.'}
       </div>
@@ -367,8 +428,16 @@ const Chat = (props:any) => {
   <>
   <Messageslist ref={msglist} style={{color: '#000913',textAlign: 'center',alignItems: 'center',display: 'flex',flexDirection: 'column'}} id='MessageList'>
     <div style={{marginTop:'10%'}}>
-      <h2>Send messages to friends:</h2>
-      <h4 style={{color: '#1982fc'}}>Choose a group or a friend from the contacts panel on your left.</h4>
+      <h2>Send messages to friends.</h2>
+      {current_user !== null ?
+        <h4 style={{color: '#1982fc'}}>Choose a group or a friend from the contacts panel on your left.</h4>
+      :
+        <div style={{display:'flex',justifyContent:'center'}}>
+        <LeaveButton onClick={()=>navigate('/sign-in')} style={{padding:'6px 20px 6px 20px'}}>
+          Sign In
+        </LeaveButton>
+        </div>
+      }
       <div>
         {current_user !== null&&
           <CreateGroupButton onClick={()=>{updateShowCreateGroup(true)}}>

@@ -44,7 +44,7 @@ transition: all 0.4s ease-in-out;
 `
 export const SendFriendRequestBtn = styled.button`
 border: 1px solid #1982FC;
-margin-top: 25px;
+margin-top: 5px;
 background: #1982FC ;
 color: #fff ;
 height:8%;

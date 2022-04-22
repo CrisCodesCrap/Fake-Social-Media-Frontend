@@ -33,9 +33,10 @@ const Signin = (props:any) => {
       if (response.data['code'] === 'success'){
         window.localStorage.setItem('token',response.data['token'])
         window.localStorage.setItem('user', logindata.username)
-        console.log(window.localStorage.getItem('user'))
         auth.signin(logindata.username)
         navigate('/')
+      }else if(response.data['code'] === 'Wrong credentials'){
+        alert('Wrong credentials.')
       } 
     })
     .catch(error => console.error(error))
@@ -47,8 +48,8 @@ const Signin = (props:any) => {
       <Form onSubmit={APIRequestHandler}>
         <FormWrapper>
           <h1 style={{marginTop: '150px',color:'#000913'}}>Sign in<UserIcon></UserIcon></h1>
-          <FormInput placeholder="Username:" onChange={ e => handleusername(e)} name='username' type="text" ></FormInput>
-          <FormInput placeholder="Password:" onChange={ e => handlepassword(e)} name='password' type={isprivacy?'password':'text'} style={{marginBottom:'24px'}}></FormInput>
+          <FormInput onKeyPress={(e)=> e.key === 'Enter' && APIRequestHandler()} placeholder="Username:" onChange={ e => handleusername(e)} name='username' type="text" ></FormInput>
+          <FormInput onKeyPress={(e)=> e.key === 'Enter' && APIRequestHandler()} placeholder="Password:" onChange={ e => handlepassword(e)} name='password' type={isprivacy?'password':'text'} style={{marginBottom:'24px'}}></FormInput>
           {isprivacy?<LockLocked onClick={()=>{change_privacy(isprivacy?false:true)}}></LockLocked>:undefined}
           {!isprivacy?<LockOpen  onClick={()=>{change_privacy(isprivacy?false:true)}}></LockOpen>:undefined}
           <br></br>

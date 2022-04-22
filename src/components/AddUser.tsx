@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import {Wrapper, Exit, WindowWrapper, Header} from './AddUserElements'
 import { ConfirmButton, Delete, FoundSearchUsers, FoundUserPic, GroupInput, Search, UserWrapper, WindowContentMini } from './CreateGroupElements'
 
-const AddUser = ({updateShowAddUser, currentUser,currentUserChat}:any) => {
+const AddUser = ({updateShowAddUser, updateCurrentUserChat,currentUser,currentUserChat}:any) => {
     const [currentUserSearch, updateSearch] = useState<string>("")
     const [showCross, setShowCross] = useState<boolean>(false)
     const [selectedUsers, updateSelectedUsers] = useState<string[]>([])
@@ -11,24 +11,35 @@ const AddUser = ({updateShowAddUser, currentUser,currentUserChat}:any) => {
     const input = useRef<any>(null)
     function AddUserHandler() {
         const addUserUrl = 'http://localhost:8000/addUserToGroup/'+currentUser
-        axios.post(addUserUrl,{'username':currentUser,'room':currentUserChat.room,'usersToAdd':selectedUsers})
-        .then(response => {
-        updateShowAddUser(false)
-        axios.post('http://127.0.0.1:4000/send_msg',response.data)
+        axios.post(addUserUrl,{'username':currentUser,'room':currentUserChat.room,'usersToAdd':selectedUsers}).then(async response => {
+        await axios.post('http://127.0.0.1:4000/send_msg',response.data)
     })
+    updateCurrentUserChat(
+      {username:currentUserChat.username,
+        room:currentUserChat.room,
+        type:currentUserChat.type,
+        admin:currentUserChat.admin,
+        isCreator:currentUserChat.isCreator,
+        created:currentUserChat.created,
+        participants:[...currentUserChat.participants, ...selectedUsers]
+      })
+    updateShowAddUser(false)
+    updateSelectedUsers([])
+    updateSearchResults([])
     }
     function QueryUserHandler(e:any){
-        updateSearch(e.target.value)
+      e.preventDefault()
+      updateSearch(e.target.value)
         axios.post('http://localhost:8000/query_users',{'username_fragment':currentUserSearch})
         .then(response => {
           updateSearchResults(response.data['found_users'])
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
         })
         currentUserSearch === '' && updateSearchResults([])
       }
-      function selectUser(user:string){
+    function selectUser(user:string){
         if(selectedUsers.includes(user)){
           updateSelectedUsers(selectedUsers.filter(selectedUser => selectedUser !== user))
         }

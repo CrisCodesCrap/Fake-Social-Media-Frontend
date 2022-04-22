@@ -52,13 +52,13 @@ const Signup = (props:any):ReactElement => {
     <Navigate to='/Account'/>
   )} 
   return (
-    <Wrapper>
+    <Wrapper onKeyPress={(e)=> e.key === 'Enter' && APIRequestHandler()}>
       <Form>
         <FormWrapper>
           <h1 style={{marginTop: '150px',color:'#000913'}}>Sign up<UserIcon></UserIcon></h1>
           <FormInput placeholder="Email:" type="email" onChange={handleemail}></FormInput>
-          <FormInput placeholder="Username:" type="text" onChange={handleusername}></FormInput>
-          <FormInput placeholder="Password:" type={isprivacy?'password':'text'} onChange={handlepassword} style={{marginBottom:'24px'}}></FormInput>
+          <FormInput onKeyPress={(e)=> e.key === 'Enter' && APIRequestHandler()} placeholder="Username:" type="text" onChange={handleusername}></FormInput>
+          <FormInput onKeyPress={(e)=> e.key === 'Enter' && APIRequestHandler()} placeholder="Password:" type={isprivacy?'password':'text'} onChange={handlepassword} style={{marginBottom:'24px'}}></FormInput>
           {isprivacy?<LockLocked onClick={()=>{change_privacy(isprivacy?false:true)}}></LockLocked>:undefined}
           {!isprivacy?<LockOpen onClick={()=>{change_privacy(isprivacy?false:true)}}></LockOpen>:undefined}
           <br></br>
@@ -66,7 +66,7 @@ const Signup = (props:any):ReactElement => {
           <br></br>
 
           {width<=768?<br></br>:undefined}
-          <SubmitButton onClick={APIRequestHandler}>Sign in</SubmitButton>
+          <SubmitButton onClick={APIRequestHandler}>Sign up</SubmitButton>
         </FormWrapper>
       </Form>
     </Wrapper>

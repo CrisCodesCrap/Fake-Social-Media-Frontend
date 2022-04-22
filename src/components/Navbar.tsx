@@ -75,8 +75,8 @@ const Navbar = (props:any):ReactElement => {
             }} />:undefined}
             {width<=768?<NavBtnLeftMobile to='/'>Home</NavBtnLeftMobile>:undefined}
             {width<=768?<MobileNavMenu style={{display: navshow?'block':'none'}}>
-                <MobileNavMenuButtonText to='/Chat'>
-                  Chat
+                <MobileNavMenuButtonText to='/Messages'>
+                  Messages
                 </MobileNavMenuButtonText>
                 {logged_in?<><MobileNavMenuButtonText to='/Account'>
                   Account 
@@ -149,7 +149,7 @@ const Navbar = (props:any):ReactElement => {
                   )}
                 </UserList>
               </div>
-              <NavBtnRight to='/Chat'>Chat</NavBtnRight>
+              <NavBtnRight to='/Messages'>Messages</NavBtnRight>
               {logged_in?
               <>
                 <NavBtnRight to={urlhandle}>{window.localStorage.getItem('user')}
@@ -198,7 +198,7 @@ const Navbar = (props:any):ReactElement => {
                       )
                     })}
                       {notification_array.length === 0 &&
-                        <Notification style={{textAlign:'center',display:'flex'}}>
+                        <Notification style={{textAlign:'center',display:'flex', justifyContent:'center',paddingTop:'5%'}}>
                           You don't have any notifications present.
                         </Notification>
                       }
@@ -209,6 +209,7 @@ const Navbar = (props:any):ReactElement => {
                 <NavBtnLink to='/sign-in' onClick={()=>{
                   const user_url = 'http://localhost:8000/set_offline/'+localStorage.getItem('user')
                   axios.post(user_url,{'user':localStorage.getItem('user')})
+                  props.updateCurrentChat({username:'',room:0,type:undefined,admin:'',isCreator:false,participants:[],created:new Date()})
                   props.signout()
                   }}>
                   Logout

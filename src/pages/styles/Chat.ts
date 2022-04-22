@@ -129,7 +129,7 @@ export const LeaveButton = styled.div`
     height: 20px;
     width: fit-content;
     block-size: fit-content;
-    margin: 3% 1% 0 1%;
+    margin: 5% 1% 0 1%;
     cursor: pointer;
     text-align: center;
     transition: all 0.4s ease-in-out; 

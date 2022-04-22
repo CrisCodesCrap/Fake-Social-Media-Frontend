@@ -17,6 +17,7 @@ export const Bell = styled(FaBell)`
 export const BellDropDown = styled.div`
 background: transparent;
 margin-top: 25px;
+box-shadow: -4px -3px 45px 21px rgba(0,0,0,0.35);
 display: block;
 right: 0;
 color: #fff;
@@ -27,7 +28,7 @@ z-index:1000000;
 `
 export const Notification = styled.div`
 position:relative;
-background:#3994FC;
+background:#1982fc;
 min-height:40px;
 width:100%;
 transition: all 0.4s ease-in-out;
@@ -101,7 +102,7 @@ export const UserList = styled.div`
 `
 export const DropdownContent = styled.div`
 width:100%;
-background: #BDDBFE;
+background: #1982fc;
 height: 100px;
 padding: 2px 8px 2px 8px;
 border-radius: 0 0 2px 2px;
@@ -110,7 +111,10 @@ export const NotificationHeader = styled.div`
 padding: 2px 8px 2px 8px;
 background:#024A9B;
 height: 40px;
+border-radius: 2px 2px 0px 0px;
+display: flex;
 align-items: center;
+justify-content: center;
 
 color:#fff;
 width: 100%;
@@ -152,7 +156,6 @@ export const User_Icon = styled.img`
 export const Nav = styled.nav `
   height: 120px;
   user-select: none;
-  border-bottom: 1px solid #1982FC;
   display: flex;
   padding: 0.2rem calc((100vw - 1000px) / 2);
   z-index: 100;
