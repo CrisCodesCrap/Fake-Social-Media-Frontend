@@ -1,23 +1,14 @@
-# mockup-chat
-Web chat mockup
-This is the react.js frontend for my chat.
-The app is fullstack with a fastapi-api which is also deployed on heroku.
-My code is complete garbage. Most of it is written that was just because I am lazy af.
-The technologies used are:
-  React JS with TypeScript
-    Styled Components
-    React-Router
-    Axios
-    usehooks-ts
-    Moment.js
-    tippy.js
-    emoji-picker-react
-    The corresponding types for each library listed aswell..
-  FastAPI
-    starlette
-    pydantic
-    sqlalchemy
-    sqlite
+# Fake Social Media Frontend
+This is the react.ts ⚛️ frontend for my Fake Social Media.
+My code is complete garbage because I treated this project as something to learn from as opposed to something to show off with.
+I view this repo and project as a part of my growth and really appreciate it the way it is ❤️.
+The technologies used are:<br>
+    React TypeScript <br>
+    Styled-Components<br>
+    React-Router<br>
+    Axios<br>
+    usehooks-ts<br>
+    Moment.js<br>
+    tippy.js<br>
+    emoji-picker-react<br>
 
-The project is in no way done, I will be commiting in the coming days!
-My view for this is to make is feel better in terms of UI and functionalities.
