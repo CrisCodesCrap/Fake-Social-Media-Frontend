@@ -11,4 +11,5 @@ The technologies used are:<br>
     Moment.js<br>
     tippy.js<br>
     emoji-picker-react<br>
-
+Here is a sneak peak of the UI:
+![image](https://user-images.githubusercontent.com/90000349/170483646-8a39a8f5-4314-4953-bc75-ead2b08a6be8.png)
